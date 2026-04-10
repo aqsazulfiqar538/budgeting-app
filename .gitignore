@@ -48,3 +48,6 @@
 # Ignore yarn files
 /yarn-error.log
 yarn-debug.log*
+
+/app/assets/builds/*
+!/app/assets/builds/.keep
