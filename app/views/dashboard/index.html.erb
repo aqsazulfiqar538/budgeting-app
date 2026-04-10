@@ -1,0 +1,14 @@
+<div class="min-h-screen w-full bg-gray-100">
+  <nav class="bg-white shadow px-6 py-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold text-gray-800">Budgeting App</h1>
+    <div class="flex items-center gap-4">
+      <span class="text-sm text-gray-600">Hello, <%= current_user.first_name %></span>
+      <%= button_to "Logout", destroy_user_session_path, method: :delete,
+          class: "bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-2 rounded-lg cursor-pointer transition duration-200" %>
+    </div>
+  </nav>
+
+  <div class="p-6">
+    <h2 class="text-2xl font-bold text-gray-800">Welcome, <%= current_user.full_name %>!</h2>
+  </div>
+</div>
