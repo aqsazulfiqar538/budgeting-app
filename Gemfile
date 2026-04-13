@@ -19,6 +19,12 @@ gem "tailwindcss-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
+gem "ruby_llm"
+gem "sidekiq"
+gem "sidekiq-cron"
+
+gem "connection_pool", "~> 2.4"
+
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
 
@@ -61,6 +67,7 @@ group :development do
   gem "web-console"
   gem "annotate"
   gem "devise"
+  gem "letter_opener"
 end
 
 group :test do
