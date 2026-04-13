@@ -6,7 +6,7 @@ class Recommendation < ApplicationRecord
   belongs_to :user
 
   enum :action, {
-    none:                 0,
+    no_action:            0,
     review_spending:      1,
     set_budget_limit:     2,
     seek_alternatives:    3,
@@ -14,7 +14,7 @@ class Recommendation < ApplicationRecord
   }
 
   ACTION_LABELS = {
-    "none"                => "Looks good",
+    "no_action"                => "Looks good",
     "review_spending"     => "Review your spending",
     "set_budget_limit"    => "Set a budget limit",
     "seek_alternatives"   => "Find cheaper alternatives"

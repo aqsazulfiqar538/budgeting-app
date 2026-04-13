@@ -1,8 +1,15 @@
 Rails.application.routes.draw do
-  get "dashboard/index"
   devise_for :users
 
-  root "dashboard#index"
+  authenticated :user do
+    root "dashboard#index", as: :authenticated_root
+  end
 
-  get "up" => "rails/health#show", as: :rails_health_check
+  unauthenticated do
+    root to: redirect("/users/sign_in")
+  end
+
+  get "/dashboard", to: "dashboard#index", as: :dashboard
+
+  resources :recommendations, only: [:index, :show, :new, :create]
 end
