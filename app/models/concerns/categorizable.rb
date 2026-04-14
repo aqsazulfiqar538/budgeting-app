@@ -40,6 +40,18 @@ module Categorizable
       ai_response["category_score"].to_i
     end
 
+    def budget_breakdown
+      ai_response["budget_breakdown"] || []
+    end
+
+    def total_allocated
+      ai_response["total_allocated"].to_i
+    end
+
+    def remaining
+      ai_response["remaining"].to_i
+    end
+
     def derive_action
       score = category_score
       sev   = severity
