@@ -8,7 +8,32 @@
     </div>
   </nav>
 
-  <div class="p-6">
+  <div class="max-w-4xl mx-auto px-4 py-10">
     <h2 class="text-2xl font-bold text-gray-800">Welcome, <%= current_user.full_name %>!</h2>
+
+    <p class="text-gray-500 mb-10">Choose a category to manage your budget.</p>
+		
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+			<% [
+				{ key: "food", label: "Food", color: "bg-orange-50 border-orange-200" },
+				{ key: "travel", label: "Travel", color: "bg-blue-50 border-blue-200"   },
+				{ key: "medication", label: "Medication", color: "bg-green-50 border-green-200"  }
+			].each do |cat| %>
+				<%= link_to recommendations_path(category: cat[:key]),
+							class: "#{cat[:color]} border rounded-2xl p-6 flex flex-col gap-3 hover:shadow-md transition cursor-pointer",
+							data: { turbo_frame: "category_panel" } do %>
+					<h2 class="text-xl font-semibold text-gray-700"><%= cat[:label] %></h2>
+					<p class="text-sm text-gray-500">
+						<%= @category_counts[cat[:key].to_sym] %> recommendation(s)
+					</p>
+					<span class="text-sm font-medium text-blue-600">View all →</span>
+				<% end %>
+			<% end %>
+		</div>
+
+		<%= turbo_frame_tag "category_panel", class: "block mt-10" do %>
+			<p class="text-center text-gray-400 text-sm mt-6">
+			Click a category above to see recommendations.
+			</p>
+		<% end %>
   </div>
-</div>
