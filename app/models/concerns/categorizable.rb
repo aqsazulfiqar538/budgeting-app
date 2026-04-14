@@ -23,5 +23,38 @@ module Categorizable
     def severity
       ai_response["severity"].to_s
     end
+
+    def summary
+      ai_response["summary"].to_s.truncate(100)
+    end
+
+    def tips
+      ai_response["tips"] || []
+    end
+
+    def estimated_savings
+      ai_response["estimated_savings"].to_s
+    end
+
+    def category_score
+      ai_response["category_score"].to_i
+    end
+
+    def derive_action
+      score = category_score
+      sev   = severity
+
+      if sev == "high" || score < 30
+        :urgent_intervention
+      elsif sev == "medium" || score < 50
+        :review_spending
+      elsif score < 70
+        :set_budget_limit
+      elsif sev == "low" && score < 85
+        :seek_alternatives
+      else
+        :no_action
+      end
+    end
   end
 end

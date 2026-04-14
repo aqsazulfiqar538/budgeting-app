@@ -14,10 +14,11 @@ class Recommendation < ApplicationRecord
   }
 
   ACTION_LABELS = {
-    "no_action"                => "Looks good",
+    "no_action"           => "Looks good",
     "review_spending"     => "Review your spending",
     "set_budget_limit"    => "Set a budget limit",
     "seek_alternatives"   => "Find cheaper alternatives"
+    "urgent_intervention" => "Urgent! Act now"
   }.freeze
 
   def action_label

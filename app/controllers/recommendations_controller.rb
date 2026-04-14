@@ -1,10 +1,13 @@
 class RecommendationsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_category, only: %i[index new]
-  before_action :validate_category, only: %i[index new create]
-  before_action :set_recommendation, only: :show
 
   def index
+    @category = params[:category].to_s
+
+    unless Recommendation::CATEGORIES.include?(@category)
+      redirect_to dashboard_path, alert: "Invalid category." and return
+    end
+
     @recommendations = current_user.recommendations
                                    .public_send(@category)
                                    .recent
@@ -18,48 +21,39 @@ class RecommendationsController < ApplicationController
 
   def new
     @category = params[:category].to_s
-
-    @recommendation = current_user.recommendations.build(category: @category)
+    unless Recommendation::CATEGORIES.include?(@category)
+      redirect_to dashboard_path, alert: "Please choose a category first." and return
+    end
+    @recommendation = Recommendation.new
   end
 
   def create
-    @category = recommendation_params[:category].to_s
+    @category = params[:recommendation][:category].to_s
+
+    unless Recommendation::CATEGORIES.include?(@category)
+      redirect_to dashboard_path, alert: "Invalid category." and return
+    end
+
+    ai_response = AiBudgetService.new(
+      @category,
+      params[:recommendation][:prompt_input]
+    ).call
 
     @recommendation = current_user.recommendations.build(
       category:     @category,
-      prompt_input: recommendation_params[:prompt_input],
-      ai_response:  {}
+      prompt_input: params[:recommendation][:prompt_input],
+      ai_response:  ai_response
     )
 
-    # Default action (as tthere's no AI yet)
-    @recommendation.action = "no_action"
+    @recommendation.action = @recommendation.derive_action
 
     if @recommendation.save
       respond_to do |format|
         format.turbo_stream
-        format.html do
-          redirect_to recommendation_path(@recommendation), notice: "Saved!"
-        end
+        format.html { redirect_to recommendation_path(@recommendation), notice: "Saved!" }
       end
     else
       render :new, status: :unprocessable_entity
     end
-  end
-
-  private
-
-  def recommendation_params
-    params.require(:recommendation).permit(:category, :prompt_input)
-  end
-
-  def set_category
-    @category = params[:category].to_s
-  end
-
-  def validate_category
-    return if Recommendation::CATEGORIES.include?(@category)
-
-    redirect_to dashboard_path,
-                alert: @category.present? ? "Invalid category." : "Please choose a category first."
   end
 end
