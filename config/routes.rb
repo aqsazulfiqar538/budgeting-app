@@ -11,5 +11,5 @@ Rails.application.routes.draw do
 
   get "/dashboard", to: "dashboard#index", as: :dashboard
 
-  resources :recommendations, only: [:index, :show, :new, :create]
+  resources :recommendations, only: [ :index, :show, :new, :create ]
 end
