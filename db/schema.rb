@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_14_143621) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_15_134957) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -42,11 +42,37 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_14_143621) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "categories", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.boolean "active", default: true, null: false
+    t.integer "sort_order", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_categories_on_slug", unique: true
+  end
+
   create_table "chats", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "model_id"
     t.index ["model_id"], name: "index_chats_on_model_id"
+  end
+
+  create_table "expenses", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "category_id", null: false
+    t.string "title", null: false
+    t.decimal "amount", precision: 12, scale: 2, null: false
+    t.date "start_date", null: false
+    t.date "end_date"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_expenses_on_category_id"
+    t.index ["user_id", "category_id"], name: "index_expenses_on_user_id_and_category_id"
+    t.index ["user_id", "start_date"], name: "index_expenses_on_user_id_and_start_date"
+    t.index ["user_id"], name: "index_expenses_on_user_id"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -138,6 +164,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_14_143621) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "chats", "models"
+  add_foreign_key "expenses", "categories"
+  add_foreign_key "expenses", "users"
   add_foreign_key "messages", "chats"
   add_foreign_key "messages", "models"
   add_foreign_key "messages", "tool_calls"

@@ -4,7 +4,7 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
-  has_many :recommendations, dependent: :destroy
+  has_many :expenses, dependent: :destroy
 
   validates :first_name, presence: true, length: { maximum: 50 }
   validates :last_name, presence: true, length: { maximum: 50 }
@@ -13,9 +13,5 @@ class User < ApplicationRecord
 
   def full_name
     "#{first_name} #{last_name}"
-  end
-
-  def inactive?
-    recommendations.last_14_days.none?
   end
 end
