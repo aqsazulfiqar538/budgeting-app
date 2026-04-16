@@ -1,57 +1,45 @@
 class ExpensesController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_expense, only: [ :show, :edit, :update, :destroy ]
-  before_action :load_categories, only: [ :new, :edit, :create, :update ]
 
   def index
-    @expenses = current_user.expenses.filter_by(category_id: params[:category_id],
-                                                start_date: params[:start_date],
-                                                end_date: params[:end_date])
-
-    @categories = Category.active.sorted
+    expenses = current_user.expenses.filter_by(
+      category_id: params[:category_id],
+      start_date: params[:start_date],
+      end_date: params[:end_date]
+    )
+    render json: expenses
   end
 
   def show
-  end
-
-  def new
-    @expense = current_user.expenses.build(start_date: Date.current)
+    render json: expense
   end
 
   def create
-    @expense = current_user.expenses.build(expense_params)
-
-    if @expense.save
-      redirect_to expense_path(@expense), notice: "Expense created successfully."
+    new_expense = current_user.expenses.build(expense_params)
+    if new_expense.save
+      render json: new_expense, status: :created
     else
-      render :new, status: :unprocessable_entity
+      render json: { errors: new_expense.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
-  def edit
-  end
-
   def update
-    if @expense.update(expense_params)
-      redirect_to expense_path(@expense), notice: "Expense updated successfully."
+    if expense.update(expense_params)
+      render json: expense, status: :ok
     else
-      render :edit, status: :unprocessable_entity
+      render json: { errors: expense.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
   def destroy
-    @expense.destroy
-    redirect_to expenses_path, notice: "Expense deleted."
+    expense.destroy
+    render json: { message: "Expense deleted successfully." }, status: :ok
   end
 
   private
 
-  def set_expense
-    @expense = current_user.expenses.find(params[:id])
-  end
-
-  def load_categories
-    @categories = Category.active.sorted
+  def expense
+    @expense ||= current_user.expenses.find(params[:id])
   end
 
   def expense_params

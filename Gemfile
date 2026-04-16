@@ -23,6 +23,9 @@ gem "ruby_llm"
 gem "sidekiq"
 gem "sidekiq-cron"
 
+gem 'jsonapi-serializer'
+gem 'rack-cors'
+
 gem "connection_pool", "~> 2.4"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
@@ -67,6 +70,7 @@ group :development do
   gem "web-console"
   gem "annotate"
   gem "devise"
+  gem 'devise-jwt'
   gem "letter_opener"
 end
 
