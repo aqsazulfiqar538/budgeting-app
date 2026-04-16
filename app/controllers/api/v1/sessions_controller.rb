@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
-class Api::V1::Users::SessionsController < Devise::SessionsController
+class Api::V1::SessionsController < Devise::SessionsController
   respond_to :json
   skip_before_action :authenticate_user!
-
-  wrap_parameters :user, include: [:email, :password]
+  skip_before_action :verify_signed_out_user, only: [ :create ]
 
   private
 
@@ -20,7 +19,7 @@ class Api::V1::Users::SessionsController < Devise::SessionsController
     }, status: :ok
   end
 
-  def respond_to_on_destroy(resource_or_scope = nil)
+  def respond_to_on_destroy(_resource_or_scope = nil)
     if request.headers["Authorization"].present?
       render json: { message: "Logged out successfully." }, status: :ok
     else

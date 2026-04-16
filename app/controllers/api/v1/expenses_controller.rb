@@ -1,23 +1,21 @@
-class ExpensesController < ApplicationController
-  before_action :authenticate_user!
-
+class Api::V1::ExpensesController < ApplicationController
   def index
     expenses = current_user.expenses.filter_by(
       category_id: params[:category_id],
       start_date: params[:start_date],
       end_date: params[:end_date]
     )
-    render json: expenses
+    render json: ExpenseSerializer.new(expenses, include: [ :category ]).serializable_hash
   end
 
   def show
-    render json: expense
+    render json: ExpenseSerializer.new(expense, include: [ :category ]).serializable_hash
   end
 
   def create
-    new_expense = current_user.expenses.build(expense_params)
+    new_expense = current_user.expenses.new(expense_params)
     if new_expense.save
-      render json: new_expense, status: :created
+      render json: ExpenseSerializer.new(new_expense, include: [ :category ]).serializable_hash, status: :created
     else
       render json: { errors: new_expense.errors.full_messages }, status: :unprocessable_entity
     end
@@ -25,7 +23,7 @@ class ExpensesController < ApplicationController
 
   def update
     if expense.update(expense_params)
-      render json: expense, status: :ok
+      render json: ExpenseSerializer.new(expense, include: [ :category ]).serializable_hash
     else
       render json: { errors: expense.errors.full_messages }, status: :unprocessable_entity
     end
