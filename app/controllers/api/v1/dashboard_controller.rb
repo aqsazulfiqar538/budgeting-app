@@ -1,6 +1,4 @@
-class DashboardController < ApplicationController
-  before_action :authenticate_user!
-
+class Api::V1::DashboardController < ApplicationController
   def index
     total_expenses = current_user.expenses.sum(:amount)
     current_month_total = current_user.expenses.current_month.sum(:amount)

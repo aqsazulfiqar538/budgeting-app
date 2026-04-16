@@ -43,8 +43,8 @@ class Expense < ApplicationRecord
   }
   scope :filter_by, ->(category_id: nil, start_date: nil, end_date: nil) {
     includes(:category)
-      .by_category(:category_id)
-      .in_date_range(:start_date ,:end_date)
+      .by_category(category_id)
+      .in_date_range(start_date ,end_date)
       .recent
   }
 

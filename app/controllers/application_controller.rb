@@ -1,10 +1,5 @@
-class ApplicationController < ActionController::Base
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
-  allow_browser versions: :modern
-
-  # Changes to the importmap will invalidate the etag for HTML responses
-  stale_when_importmap_changes
-
+class ApplicationController < ActionController::API
+  before_action :authenticate_user!
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   protected
@@ -13,13 +8,5 @@ class ApplicationController < ActionController::Base
     devise_parameter_sanitizer.permit(:sign_up, keys: [
       :first_name, :last_name, :phone_number, :date_of_birth
     ])
-  end
-
-  def after_sign_up_path_for(resource)
-    root_path
-  end
-
-  def after_sign_in_path_for(resource)
-    root_path
   end
 end

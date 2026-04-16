@@ -267,6 +267,7 @@ Devise.setup do |config|
   #
   # The "*/*" below is required to match Internet Explorer requests.
   config.navigational_formats = []
+  config.skip_session_storage = [:http_auth, :params_auth]
   config.jwt do |jwt|
     jwt.secret = Rails.application.credentials.devise_jwt_secret_key!
     jwt.dispatch_requests = [['POST', %r{^/api/v1/users/sign_in$}]]
