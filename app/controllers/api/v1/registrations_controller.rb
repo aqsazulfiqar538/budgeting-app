@@ -8,31 +8,20 @@ class Api::V1::RegistrationsController < Devise::RegistrationsController
 
   def sign_up_params
     params.require(:user).permit(
-      :email,
-      :password,
-      :password_confirmation,
-      :first_name,
-      :last_name,
-      :phone_number,
-      :date_of_birth
+      :email, :password, :password_confirmation,
+      :first_name, :last_name, :phone_number, :date_of_birth
     )
   end
 
   def respond_with(resource, _opts = {})
     if resource.persisted?
+      message = resource.confirmed? ? "Signed up successfully." : "Signed up successfully. Please check your email to confirm your account."
       render json: {
-        message: "Signed up successfully.",
-        user: {
-          id: resource.id,
-          email: resource.email,
-          first_name: resource.first_name,
-          last_name: resource.last_name
-        }
+        message: message,
+        user: { id: resource.id, email: resource.email, first_name: resource.first_name, last_name: resource.last_name }
       }, status: :created
     else
-      render json: {
-        errors: resource.errors.full_messages
-      }, status: :unprocessable_entity
+      render json: { errors: resource.errors.full_messages }, status: :unprocessable_entity
     end
   end
 end

@@ -8,26 +8,16 @@ gem "propshaft"
 gem "pg", "~> 1.1"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
-# Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
-gem "importmap-rails"
-# Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
-gem "turbo-rails"
-# Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
-gem "stimulus-rails"
-# Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
-gem "tailwindcss-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
-
-gem "ruby_llm"
-gem "sidekiq"
-gem "sidekiq-cron"
 
 gem 'jsonapi-serializer'
 gem 'rack-cors'
 
 gem "devise"
-gem 'devise-jwt'
+gem "devise-jwt"
+gem "pagy", "~> 9.0"
+gem "rack-attack"
 
 gem "connection_pool", "~> 2.4"
 

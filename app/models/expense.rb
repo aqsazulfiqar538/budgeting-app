@@ -12,43 +12,63 @@
 #  notes       :text
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
+#  group_id    :integer
+#  deleted_at  :datetime
 #
 # Indexes
 #
 #  index_expenses_on_category_id              (category_id)
+#  index_expenses_on_deleted_at               (deleted_at)
+#  index_expenses_on_group_id                 (group_id)
 #  index_expenses_on_user_id                  (user_id)
 #  index_expenses_on_user_id_and_category_id  (user_id,category_id)
 #  index_expenses_on_user_id_and_start_date   (user_id,start_date)
 #
 
+# frozen_string_literal: true
+
 class Expense < ApplicationRecord
   belongs_to :user
   belongs_to :category
+  belongs_to :group, optional: true
+
+  has_many :expense_participants, dependent: :destroy
+  has_many :participants, through: :expense_participants, source: :user
+  has_many :repayments, dependent: :destroy
+  has_many :comments, dependent: :destroy
 
   validates :title, presence: true
   validates :amount, presence: true, numericality: { greater_than: 0 }
   validates :start_date, presence: true
   validate :end_date_after_start_date, if: -> { start_date.present? && end_date.present? }
+  validate :category_accessible_to_user, if: :category_id?
 
+  scope :active, -> { where(deleted_at: nil) }
   scope :recent, -> { order(start_date: :desc, created_at: :desc) }
-  scope :by_category, ->(category_id) { where(category_id: category_id) if category_id.present? }
-  scope :in_date_range, ->(from, to){
-    scope = all
-    scope = scope.where("start_date >= ?", from) if from.present?
-    scope = scope.where("start_date <= ?", to) if to.present?
-    scope
+
+  # Returns expenses where user is the payer OR a participant
+  scope :visible_to, ->(user) {
+    active.left_joins(:expense_participants)
+      .where("expenses.user_id = :uid OR expense_participants.user_id = :uid", uid: user.id)
+      .distinct
   }
-  scope :current_month, -> {
-    where(start_date: Date.current.beginning_of_month..Date.current.end_of_month)
-  }
-  scope :filter_by, ->(category_id: nil, start_date: nil, end_date: nil) {
-    includes(:category)
-      .by_category(category_id)
-      .in_date_range(start_date ,end_date)
-      .recent
-  }
+
+  def shared?
+    expense_participants.size > 1
+  end
+
+  def soft_delete!
+    update!(deleted_at: Time.current)
+  end
 
   private
+
+  def category_accessible_to_user
+    return unless category
+    unless category.user_id.nil? || category.user_id == user_id
+      errors.add(:category, "is not accessible")
+    end
+  end
 
   def end_date_after_start_date
     errors.add(:end_date, "must be on or after start date") if end_date < start_date

@@ -1,15 +1,40 @@
+# frozen_string_literal: true
+
 class Api::V1::DashboardController < ApplicationController
   def index
-    total_expenses = current_user.expenses.sum(:amount)
-    current_month_total = current_user.expenses.current_month.sum(:amount)
-    category_totals = current_user.expenses.joins(:category).group("categories.name").sum(:amount)
-    recent_expenses = current_user.expenses.includes(:category).recent.limit(5)
+    expenses = current_user.expenses.active
 
     render json: {
-      total_expenses: total_expenses,
-      current_month_total: current_month_total,
-      category_totals: category_totals,
-      recent_expenses: ExpenseSerializer.new(recent_expenses, include: [:category]).serializable_hash
+      total_expenses: expenses.sum(:amount),
+      current_month_total: expenses.where(start_date: Date.current.beginning_of_month..Date.current.end_of_month).sum(:amount),
+      category_totals: expenses.joins(:category).group("categories.name").sum(:amount),
+      recent_expenses: ExpenseSerializer.new(
+        expenses.includes(:category).recent.limit(5),
+        include: [ :category ]
+      ).serializable_hash,
+      recent_ledger_activity: recent_ledger_activity,
+      ledger_summary: LedgerService.new(current_user).summary
     }
+  end
+
+  private
+
+  def recent_ledger_activity
+    recent = Repayment.where("from_user_id = :uid OR to_user_id = :uid", uid: current_user.id)
+                      .includes(:expense, :from_user, :to_user)
+                      .order(created_at: :desc)
+                      .limit(5)
+
+    recent.map do |r|
+      {
+        id: r.id,
+        expense_title: r.expense&.title,
+        from: r.from_user.summary,
+        to: r.to_user.summary,
+        amount: r.amount,
+        settled: r.settled, #ask from abubakar bhai how to do this! q: will it hit the db?
+        created_at: r.created_at
+      }
+    end
   end
 end
