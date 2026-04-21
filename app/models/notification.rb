@@ -24,7 +24,7 @@
 
 class Notification < ApplicationRecord
   belongs_to :user
-  belongs_to :created_by, class_name: "User" 
+  belongs_to :created_by, class_name: "User"
   belongs_to :source, polymorphic: true, optional: true
 
   enum :notification_type, {

@@ -31,12 +31,12 @@ categories = {
   ] },
   "Travel" => { subs: [
     { name: "Fuel" },
-    { name: "Taxi"},
+    { name: "Taxi" },
     { name: "Parking" }
   ] },
   "Medication" => { subs: [
     { name: "Pharmacy" },
-    { name: "Doctor Visit"}
+    { name: "Doctor Visit" }
   ] },
   "Miscellaneous" => { subs: [
     { name: "Shopping" },
@@ -86,7 +86,7 @@ def find_or_create_user(attrs)
 end
 
 def make_friends(a, b, status: :accepted)
-  ids = [a.id, b.id].sort
+  ids = [ a.id, b.id ].sort
   Friendship.find_or_create_by!(user_id: ids[0], friend_id: ids[1]) do |f|
     f.requested_by_id = a.id
     f.status = status
@@ -97,7 +97,7 @@ def make_group(name:, creator:, members:, group_type: :other)
   group = Group.find_or_create_by!(name: name, created_by_id: creator.id) do |g|
     g.group_type = group_type
   end
-  ([creator] + members).each { |u| group.group_memberships.find_or_create_by!(user_id: u.id) }
+  ([ creator ] + members).each { |u| group.group_memberships.find_or_create_by!(user_id: u.id) }
   group
 end
 
@@ -140,14 +140,14 @@ sara   = find_or_create_user(email: "sara@test.com", first_name: "Sara", last_na
 zain   = find_or_create_user(email: "zain@test.com", first_name: "Zain", last_name: "Malik", phone_number: "+923007777777", date_of_birth: "1994-11-25")
 ayesha = find_or_create_user(email: "ayesha@test.com", first_name: "Ayesha", last_name: "Syed", phone_number: "+923006666666", date_of_birth: "1998-07-08")
 
-[arslan, ahmad, sara, zain, ayesha].each { |u| puts "    #{u.full_name} (#{u.email}) — #{u.initials}" }
+[ arslan, ahmad, sara, zain, ayesha ].each { |u| puts "    #{u.full_name} (#{u.email}) — #{u.initials}" }
 
 # --- Friendships ---
 puts "\n  Friendships:"
 
 [
-  [arslan, ahmad], [arslan, sara], [arslan, zain], [arslan, ayesha],
-  [ahmad, sara], [ahmad, zain], [sara, ayesha]
+  [ arslan, ahmad ], [ arslan, sara ], [ arslan, zain ], [ arslan, ayesha ],
+  [ ahmad, sara ], [ ahmad, zain ], [ sara, ayesha ]
 ].each { |a, b| make_friends(a, b); puts "    #{a.first_name} <-> #{b.first_name} (accepted)" }
 
 make_friends(zain, ayesha, status: :pending)
@@ -156,7 +156,7 @@ puts "    Zain -> Ayesha (pending)"
 # --- Custom categories ---
 puts "\n  Custom Categories:"
 
-Category.find_or_create_by!( user_id: arslan.id) do |c|
+Category.find_or_create_by!(user_id: arslan.id) do |c|
   c.name = "Office Lunch"
 end
 puts "    Arslan: Office Lunch"
@@ -169,12 +169,12 @@ puts "    Ahmad: Gym & Fitness"
 # --- Groups ---
 puts "\n  Groups:"
 
-office = make_group(name: "Office Dinner", creator: arslan, members: [ahmad, sara])
-trip   = make_group(name: "Islamabad Trip", creator: arslan, members: [ahmad, zain], group_type: :trip)
-flat   = make_group(name: "Flat Expenses", creator: ahmad, members: [arslan, zain], group_type: :apartment)
-girls  = make_group(name: "Girls Hangout", creator: sara, members: [ayesha])
+office = make_group(name: "Office Dinner", creator: arslan, members: [ ahmad, sara ])
+trip   = make_group(name: "Islamabad Trip", creator: arslan, members: [ ahmad, zain ], group_type: :trip)
+flat   = make_group(name: "Flat Expenses", creator: ahmad, members: [ arslan, zain ], group_type: :apartment)
+girls  = make_group(name: "Girls Hangout", creator: sara, members: [ ayesha ])
 
-[office, trip, flat, girls].each { |g| puts "    #{g.name} (#{g.group_type}) — #{g.members.count} members" }
+[ office, trip, flat, girls ].each { |g| puts "    #{g.name} (#{g.group_type}) — #{g.members.count} members" }
 
 # --- Subcategory lookups ---
 groceries     = Category.find_by!(name: "groceries")
@@ -213,16 +213,16 @@ end
 puts "\n  Shared Expenses:"
 
 shared_data = [
-  { payer: arslan, title: "Team Lunch at Howdy",    amount: 4500,  category: dining, participants: [arslan, ahmad, sara], group: office, start_date: 5.days.ago },
-  { payer: ahmad,  title: "Friday Pizza Night",     amount: 3600,  category: dining, participants: [arslan, ahmad, sara], group: office, start_date: 3.days.ago },
-  { payer: arslan, title: "Fuel to Islamabad",      amount: 6000,  category: fuel,   participants: [arslan, ahmad, zain], group: trip,   start_date: 7.days.ago },
-  { payer: zain,   title: "Hotel Booking",           amount: 15000, category: Category.find_by!(name: "Miscellaneous"), participants: [arslan, ahmad, zain], group: trip, start_date: 6.days.ago },
-  { payer: ahmad,  title: "Monal Restaurant",        amount: 9000,  category: dining, participants: [arslan, ahmad, zain], group: trip,   start_date: 6.days.ago },
-  { payer: ahmad,  title: "Flat Electricity Bill",   amount: 8000,  category: bills,  participants: [arslan, ahmad, zain], group: flat,   start_date: 4.days.ago },
-  { payer: arslan, title: "Flat Internet Bill",      amount: 4500,  category: bills,  participants: [arslan, ahmad, zain], group: flat,   start_date: 2.days.ago },
-  { payer: sara,   title: "Coffee & Snacks",         amount: 1200,  category: snacks, participants: [sara, ayesha],        start_date: 1.day.ago },
-  { payer: arslan, title: "Gift for Boss",           amount: 5000,  category: shopping, participants: [arslan, ahmad],      start_date: Date.current },
-  { payer: sara,   title: "Brunch at Cafe Aylanto",  amount: 4000,  category: dining, participants: [sara, ayesha],        group: girls,  start_date: 2.days.ago }
+  { payer: arslan, title: "Team Lunch at Howdy",    amount: 4500,  category: dining, participants: [ arslan, ahmad, sara ], group: office, start_date: 5.days.ago },
+  { payer: ahmad,  title: "Friday Pizza Night",     amount: 3600,  category: dining, participants: [ arslan, ahmad, sara ], group: office, start_date: 3.days.ago },
+  { payer: arslan, title: "Fuel to Islamabad",      amount: 6000,  category: fuel,   participants: [ arslan, ahmad, zain ], group: trip,   start_date: 7.days.ago },
+  { payer: zain,   title: "Hotel Booking",           amount: 15000, category: Category.find_by!(name: "Miscellaneous"), participants: [ arslan, ahmad, zain ], group: trip, start_date: 6.days.ago },
+  { payer: ahmad,  title: "Monal Restaurant",        amount: 9000,  category: dining, participants: [ arslan, ahmad, zain ], group: trip,   start_date: 6.days.ago },
+  { payer: ahmad,  title: "Flat Electricity Bill",   amount: 8000,  category: bills,  participants: [ arslan, ahmad, zain ], group: flat,   start_date: 4.days.ago },
+  { payer: arslan, title: "Flat Internet Bill",      amount: 4500,  category: bills,  participants: [ arslan, ahmad, zain ], group: flat,   start_date: 2.days.ago },
+  { payer: sara,   title: "Coffee & Snacks",         amount: 1200,  category: snacks, participants: [ sara, ayesha ],        start_date: 1.day.ago },
+  { payer: arslan, title: "Gift for Boss",           amount: 5000,  category: shopping, participants: [ arslan, ahmad ],      start_date: Date.current },
+  { payer: sara,   title: "Brunch at Cafe Aylanto",  amount: 4000,  category: dining, participants: [ sara, ayesha ],        group: girls,  start_date: 2.days.ago }
 ]
 
 shared_data.each do |data|

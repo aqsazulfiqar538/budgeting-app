@@ -5,14 +5,14 @@ class Api::V1::GroupsController < ApplicationController
   before_action :authorize_creator!, only: [ :update, :destroy ]
 
   def index
-    groups = current_user.groups.where(deleted_at: nil) #groups that are not deleted
+    groups = current_user.groups.where(deleted_at: nil) # groups that are not deleted
               .includes(:group_memberships, :users, :creator)
 
     render_paginated(groups, GroupSerializer)
   end
 
   def show
-    group_expenses = group.expenses.where(deleted_at: nil) #expenses that are not deleted within the group
+    group_expenses = group.expenses.where(deleted_at: nil) # expenses that are not deleted within the group
                            .includes(:category, expense_participants: :user, repayments: [ :from_user, :to_user ])
                            .recent
 
@@ -29,10 +29,10 @@ class Api::V1::GroupsController < ApplicationController
     user_group = current_user.created_groups.new(group_params)
 
     if user_group.save
-      user_group.group_memberships.create(user_id: current_user.id) #adding current user
-      
+      user_group.group_memberships.create(user_id: current_user.id) # adding current user
+
       member_ids.each do |uid|
-        user_group.group_memberships.create(user_id: uid) #adding valid friends 
+        user_group.group_memberships.create(user_id: uid) # adding valid friends
       end
 
       user_group.reload

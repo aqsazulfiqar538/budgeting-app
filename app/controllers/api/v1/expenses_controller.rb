@@ -46,14 +46,14 @@ class Api::V1::ExpensesController < ApplicationController
   # DELETE /api/v1/expenses/:id
   def destroy
     NotificationService.expense_deleted(expense, current_user) if expense.shared?
-    expense.update!(deleted_at: Time.current) #soft delete done here
+    expense.update!(deleted_at: Time.current) # soft delete done here
     head :no_content
   end
 
   private
 
   def fetch_filtered_expenses
-    expenses = Expense.visible_to(current_user) #if removed will show all indivitual expenses from all users
+    expenses = Expense.visible_to(current_user) # if removed will show all indivitual expenses from all users
                       .includes(:category)
                       .where.not(id: ExpenseParticipant.select(:expense_id).group(:expense_id).having("COUNT(*) > 1"))
 

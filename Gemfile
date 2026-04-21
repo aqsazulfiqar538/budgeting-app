@@ -11,8 +11,8 @@ gem "puma", ">= 5.0"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
-gem 'jsonapi-serializer'
-gem 'rack-cors'
+gem "jsonapi-serializer"
+gem "rack-cors"
 
 gem "devise"
 gem "devise-jwt"

@@ -32,7 +32,7 @@ class Api::V1::DashboardController < ApplicationController
         from: r.from_user.summary,
         to: r.to_user.summary,
         amount: r.amount,
-        settled: r.settled, #ask from abubakar bhai how to do this! q: will it hit the db?
+        settled: r.settled, # ask from abubakar bhai how to do this! q: will it hit the db?
         created_at: r.created_at
       }
     end

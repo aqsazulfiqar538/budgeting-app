@@ -14,7 +14,7 @@ class NotificationService
     end
 
     def expense_updated(expense, user)
-      recipients = expense.participants.where.not(id: user.id) #excluding the user who made the update
+      recipients = expense.participants.where.not(id: user.id) # excluding the user who made the update
       notify_all(
         recipients: recipients,
         actor: user,
