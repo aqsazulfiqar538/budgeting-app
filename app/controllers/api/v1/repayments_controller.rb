@@ -10,11 +10,10 @@ class Api::V1::RepaymentsController < ApplicationController
       return
     end
 
-    ActiveRecord::Base.transaction do
-      repayment.update!(settled: true, settled_at: Time.current)
-      create_settlement_expense!(repayment)
-      create_system_comment!(repayment)
-    end
+    repayment.update(settled: true, settled_at: Time.current)
+    create_settlement_expense(repayment)
+    create_system_comment(repayment)
+
 
     NotificationService.debt_settled(repayment, current_user)
 
@@ -38,10 +37,10 @@ class Api::V1::RepaymentsController < ApplicationController
              .find(params[:id])
   end
 
-  def create_settlement_expense!(repayment)
+  def create_settlement_expense(repayment)
     settlement_category = Category.find_by!(name: "Settlement", user_id: nil)
 
-    settlement = Expense.create!(
+    settlement = Expense.create(
       user_id: repayment.from_user_id,
       category: settlement_category,
       title: "Settlement: #{repayment.from_user.full_name} → #{repayment.to_user.full_name}",
@@ -51,12 +50,12 @@ class Api::V1::RepaymentsController < ApplicationController
     )
 
     # Add both users as participants so it shows in visible_to for both
-    settlement.expense_participants.create!(user_id: repayment.from_user_id, paid_share: repayment.amount, owed_share: repayment.amount)
-    settlement.expense_participants.create!(user_id: repayment.to_user_id, paid_share: 0, owed_share: 0)
+    settlement.expense_participants.create(user_id: repayment.from_user_id, paid_share: repayment.amount, owed_share: repayment.amount)
+    settlement.expense_participants.create(user_id: repayment.to_user_id, paid_share: 0, owed_share: 0)
   end
 
-  def create_system_comment!(repayment)
-    repayment.expense.comments.create!(
+  def create_system_comment(repayment)
+    repayment.expense.comments.create(
       user: current_user,
       content: "#{current_user.full_name} settled Rs. #{repayment.amount}",
       comment_type: :system_comment

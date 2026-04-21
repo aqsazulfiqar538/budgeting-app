@@ -34,7 +34,6 @@ class User < ApplicationRecord
     "#{first_name&.first}#{last_name&.first}".upcase
   end
 
-  # Compact hash for embedding in API responses (serializers, services)
   def summary
     { id: id, first_name: first_name, last_name: last_name, full_name: full_name, initials: initials }
   end

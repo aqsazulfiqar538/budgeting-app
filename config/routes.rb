@@ -18,11 +18,11 @@ Rails.application.routes.draw do
     namespace :v1 do
       get "/dashboard", to: "dashboard#index"
       resources :expenses do
-        resources :comments, controller: "comments", only: [ :index, :create, :destroy ]
+        resources :comments, only: [ :index, :create, :destroy ]
       end
       resources :categories, only: [ :index, :create ]
 
-      resources :ledger, only: [ :index, :show ], controller: "ledger"
+      resources :ledger, only: [ :index, :show ]
       resources :repayments, only: [] do
         member do
           patch :settle
