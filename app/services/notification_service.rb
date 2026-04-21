@@ -2,35 +2,35 @@
 
 class NotificationService
   class << self
-    def expense_created(expense, actor)
-      recipients = expense.participants.where.not(id: actor.id)
+    def expense_created(expense, user)
+      recipients = expense.participants.where.not(id: user.id)
       notify_all(
         recipients: recipients,
-        actor: actor,
+        actor: user,
         type: :expense_added,
-        content: "#{actor.full_name} added '#{expense.title}' — Rs. #{expense.amount}",
+        content: "#{user.full_name} added '#{expense.title}' — Rs. #{expense.amount}",
         source: expense
       )
     end
 
-    def expense_updated(expense, actor)
-      recipients = expense.participants.where.not(id: actor.id)
+    def expense_updated(expense, user)
+      recipients = expense.participants.where.not(id: user.id) #excluding the user who made the update
       notify_all(
         recipients: recipients,
-        actor: actor,
+        actor: user,
         type: :expense_updated,
-        content: "#{actor.full_name} updated '#{expense.title}'",
+        content: "#{user.full_name} updated '#{expense.title}'",
         source: expense
       )
     end
 
-    def expense_deleted(expense, actor)
-      recipients = expense.participants.where.not(id: actor.id)
+    def expense_deleted(expense, user)
+      recipients = expense.participants.where.not(id: user.id)
       notify_all(
         recipients: recipients,
-        actor: actor,
+        actor: user,
         type: :expense_deleted,
-        content: "#{actor.full_name} deleted '#{expense.title}'",
+        content: "#{user.full_name} deleted '#{expense.title}'",
         source: expense
       )
     end
@@ -86,13 +86,13 @@ class NotificationService
       )
     end
 
-    def debt_settled(repayment, actor)
-      other = repayment.from_user_id == actor.id ? repayment.to_user : repayment.from_user
+    def debt_settled(repayment, user)
+      other = repayment.from_user_id == user.id ? repayment.to_user : repayment.from_user
       notify(
         recipient: other,
-        actor: actor,
+        actor: user,
         type: :debt_settled,
-        content: "#{actor.full_name} settled Rs. #{repayment.amount} for '#{repayment.expense.title}'",
+        content: "#{user.full_name} settled Rs. #{repayment.amount} for '#{repayment.expense.title}'",
         source: repayment.expense
       )
     end

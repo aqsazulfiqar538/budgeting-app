@@ -40,7 +40,6 @@ class Expense < ApplicationRecord
   validates :title, presence: true
   validates :amount, presence: true, numericality: { greater_than: 0 }
   validates :start_date, presence: true
-  validate :end_date_after_start_date, if: -> { start_date.present? && end_date.present? }
   validate :category_accessible_to_user, if: :category_id?
 
   scope :active, -> { where(deleted_at: nil) }
@@ -57,10 +56,6 @@ class Expense < ApplicationRecord
     expense_participants.size > 1
   end
 
-  def soft_delete!
-    update!(deleted_at: Time.current)
-  end
-
   private
 
   def category_accessible_to_user
@@ -68,9 +63,5 @@ class Expense < ApplicationRecord
     unless category.user_id.nil? || category.user_id == user_id
       errors.add(:category, "is not accessible")
     end
-  end
-
-  def end_date_after_start_date
-    errors.add(:end_date, "must be on or after start date") if end_date < start_date
   end
 end

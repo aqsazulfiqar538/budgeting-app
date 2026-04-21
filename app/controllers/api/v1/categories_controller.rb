@@ -5,8 +5,7 @@ class Api::V1::CategoriesController < ApplicationController
 
   def index
     categories = if current_user
-      Category.where(user_id: [ nil, current_user.id ])
-              .where(active: true, parent_id: nil)
+      Category.where(user_id: [ nil, current_user.id ], active: true, parent_id: nil)
               .includes(:subcategories)
     else
       Category.system_categories.where(active: true, parent_id: nil).includes(:subcategories)

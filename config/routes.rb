@@ -40,9 +40,6 @@ Rails.application.routes.draw do
       resources :users, only: [ :show ]
 
       resources :groups do
-        member do
-          post :restore
-        end
         resources :members, controller: "group_members", only: [ :create, :destroy ]
       end
 

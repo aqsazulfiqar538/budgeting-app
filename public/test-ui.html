@@ -570,8 +570,8 @@ async function loadGroups() {
       const a = g.attributes;
       return `<div class="card" style="cursor:pointer" onclick="viewGroup(${g.id})">
         <div style="display:flex;justify-content:space-between">
-          <div><h3>${a.name}</h3><span class="badge badge-gray">${a.group_type}</span> <span style="font-size:12px;color:#6b7280">${a.member_count} members</span></div>
-          <div style="font-size:12px;color:#9ca3af">${a.members.map(m=>m.initials).join(', ')}</div>
+          <div><h3>${a.name}</h3><span class="badge badge-gray">${a.group_type}</span> <span style="font-size:12px;color:#6b7280">${a.user_count} members</span></div>
+          <div style="font-size:12px;color:#9ca3af">${a.users.map(m=>m.initials).join(', ')}</div>
         </div>
       </div>`;
     }).join('')}`;
@@ -585,14 +585,14 @@ async function viewGroup(id) {
   const friends = await api('/friends');
   const cats = await api('/categories');
   const subcats = cats.included || [];
-  const memberIds = a.members.map(m => m.id);
+  const memberIds = a.users.map(m => m.id);
   const nonMembers = friends.data.filter(f => !memberIds.includes(f.attributes.friend.id));
 
   document.getElementById('modal-content').innerHTML = `
     <h3>${a.name} <span class="badge badge-gray">${a.group_type}</span></h3>
 
-    <h4 style="font-size:13px;color:#6b7280;margin:12px 0 6px">Members (${a.member_count})</h4>
-    ${a.members.map(m => `
+    <h4 style="font-size:13px;color:#6b7280;margin:12px 0 6px">Members (${a.user_count})</h4>
+    ${a.users.map(m => `
       <div class="card-row">
         <div><span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#dbeafe;color:#1e40af;font-weight:700;font-size:11px;margin-right:8px">${m.initials}</span>${m.full_name}</div>
         <div>

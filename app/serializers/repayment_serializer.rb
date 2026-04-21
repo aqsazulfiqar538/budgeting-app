@@ -4,12 +4,6 @@ class RepaymentSerializer
   include JSONAPI::Serializer
 
   attributes :amount, :settled, :settled_at
-
-  attribute :from_user do |repayment|
-    repayment.from_user.summary
-  end
-
-  attribute :to_user do |repayment|
-    repayment.to_user.summary
-  end
+  attribute (:from_user) { |repayment| repayment.from_user.summary }
+  attribute (:to_user) { |repayment| repayment.to_user.summary }
 end

@@ -3,10 +3,11 @@
 class ExpenseSerializer
   include JSONAPI::Serializer
 
-  attributes :title, :amount, :category_id, :start_date, :end_date, :notes, :created_at, :updated_at
+  attributes :title, :amount, :category_id, :start_date, :end_date, :notes, :created_at, :updated_at, :group_id
 
-  attribute :shared, &:shared?
-  attribute :group_id
+  attribute :shared do |object|
+    object.shared?
+  end
 
   belongs_to :category, serializer: CategorySerializer
 

@@ -5,15 +5,7 @@ class NotificationSerializer
 
   attributes :notification_type, :content, :read_at, :created_at
 
-  attribute :read do |notification|
-    notification.read_at.present?
-  end
-
-  attribute :created_by do |notification|
-    notification.created_by.summary
-  end
-
-  attribute :source do |notification|
-    notification.source ? { type: notification.source_type, id: notification.source_id } : nil
-  end
+  attribute (:read) { |notification| notification.read_at.present? }
+  attribute (:created_by) { |notification| notification.created_by.summary }
+  attribute (:source) { |notification| notification.source ? { type: notification.source_type, id: notification.source_id } : nil }
 end

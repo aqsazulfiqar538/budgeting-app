@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
 class Api::V1::FriendsController < ApplicationController
-  include FriendshipRenderable
-
-  # GET /api/v1/friends — list accepted friends
   def index
     friendships = Friendship.accepted.involving(current_user)
                             .includes(:user, :friend)
-    render_paginated_friendships(friendships)
+    render_paginated(
+      friendships,
+      FriendshipSerializer,
+      serializer_options: { params: { current_user: current_user } }
+    )
   end
 
-  # GET /api/v1/friends/:id — show friend detail
   def show
     friendship = Friendship.accepted.involving(current_user).find(params[:id])
     render json: FriendshipSerializer.new(

@@ -3,17 +3,9 @@
 class GroupSerializer
   include JSONAPI::Serializer
 
-  attributes :name, :group_type, :simplify_debts, :created_at
+  attributes :name, :group_type, :created_at
 
-  attribute :member_count do |group|
-    group.members.size
-  end
-
-  attribute :members do |group|
-    group.members.map(&:summary)
-  end
-
-  attribute :created_by do |group|
-    group.creator.summary
-  end
+  attribute(:user_count) { |group| group.users.size }
+  attribute(:users) { |group| group.users.map(&:summary) }
+  attribute(:created_by) { |group| group.creator.summary }
 end

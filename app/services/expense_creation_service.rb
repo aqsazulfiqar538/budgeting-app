@@ -146,7 +146,7 @@ class ExpenseCreationService
 
   def resolve_participant_user_ids
     if @group_id.present? && @participants_data.blank?
-      Group.find(@group_id).members.pluck(:id)
+      Group.find(@group_id).users.pluck(:id)
     elsif @participants_data.present?
       @participants_data.map { |p| p[:user_id].to_i }
     else

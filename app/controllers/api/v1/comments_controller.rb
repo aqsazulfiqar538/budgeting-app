@@ -5,12 +5,8 @@ class Api::V1::CommentsController < ApplicationController
   before_action :authorize_participant!, only: [ :create ]
 
   def index
-    comments = @expense.comments.active.order_by.includes(:user)
-    pagy, records = pagy(comments)
-    render json: {
-      **CommentSerializer.new(records).serializable_hash,
-      meta: pagy_metadata(pagy)
-    }
+    comments = @expense.comments.where(deleted_at: nil).order(:created_at).includes(:user)
+    render_paginated(comments, CommentSerializer)
   end
 
   def create
@@ -32,7 +28,7 @@ class Api::V1::CommentsController < ApplicationController
       return
     end
 
-    comment.soft_delete!
+    comment.update!(deleted_at: Time.current)
     head :no_content
   end
 

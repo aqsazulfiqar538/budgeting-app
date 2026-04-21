@@ -30,11 +30,11 @@ class ApplicationController < ActionController::API
     render json: { errors: error_list }, status: status
   end
 
-  def render_paginated(collection, serializer, includes: [])
+  def render_paginated(collection, serializer, includes: nil, serializer_options: {})
     pagy, records = pagy(collection)
 
     render json: {
-      **serializer.new(records, include: includes).serializable_hash,
+      **serializer.new(records, **serializer_options).serializable_hash,
       meta: pagy_metadata(pagy)
     }
   end
