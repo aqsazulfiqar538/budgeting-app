@@ -3,7 +3,7 @@
 class Api::V1::NotificationsController < ApplicationController
   # GET /api/v1/notifications
   def index
-    notifications = current_user.notifications.recent.includes(:created_by)
+    notifications = current_user.notifications.recent.includes(:created_by, :source)
     pagy, records = pagy(notifications)
     render json: {
       **NotificationSerializer.new(records).serializable_hash,

@@ -3,7 +3,7 @@
 class Api::V1::FriendsController < ApplicationController
   def index
     friendships = Friendship.accepted.involving(current_user)
-                            .includes(:user, :friend)
+                            .includes(:friend)
     render_paginated(
       friendships,
       FriendshipSerializer,

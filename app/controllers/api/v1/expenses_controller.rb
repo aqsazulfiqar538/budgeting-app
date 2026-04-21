@@ -54,7 +54,7 @@ class Api::V1::ExpensesController < ApplicationController
 
   def fetch_filtered_expenses
     expenses = Expense.visible_to(current_user) # if removed will show all indivitual expenses from all users
-                      .includes(:category)
+                      .includes(:category, expense_participants: :user, repayments: [:from_user, :to_user])
                       .where.not(id: ExpenseParticipant.select(:expense_id).group(:expense_id).having("COUNT(*) > 1"))
 
     expenses = expenses.where(category_id: params[:category_id]) if params[:category_id].present?

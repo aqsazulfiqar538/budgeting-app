@@ -63,6 +63,7 @@ group :development do
   gem "web-console"
   gem "annotate"
   gem "letter_opener"
+  gem 'bullet'
 end
 
 group :test do

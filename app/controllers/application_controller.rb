@@ -33,8 +33,11 @@ class ApplicationController < ActionController::API
   def render_paginated(collection, serializer, includes: nil, serializer_options: {})
     pagy, records = pagy(collection)
 
+    options = serializer_options.dup 
+    options[:include] = includes if includes
+
     render json: {
-      **serializer.new(records, **serializer_options).serializable_hash,
+      **serializer.new(records, **options).serializable_hash,
       meta: pagy_metadata(pagy)
     }
   end
