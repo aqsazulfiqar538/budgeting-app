@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budgeting App — Test UI</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f3f4f6; color: #1f2937; font-size: 14px; }
+.hidden { display: none !important; }
+#app { max-width: 900px; margin: 0 auto; padding: 16px; }
+
+/* Nav */
+nav { background: #1f2937; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+nav .tabs { display: flex; gap: 8px; }
+nav button { background: #374151; color: #d1d5db; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+nav button:hover, nav button.active { background: #3b82f6; color: white; }
+nav .user-info { font-size: 12px; color: #9ca3af; }
+nav .user-info strong { color: white; }
+#logoutBtn { background: #ef4444; color: white; margin-left: 12px; }
+
+/* Auth */
+#auth-page { max-width: 400px; margin: 80px auto; background: white; padding: 32px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+#auth-page h2 { margin-bottom: 16px; }
+#auth-page input { width: 100%; padding: 8px 12px; margin-bottom: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+#auth-page button { width: 100%; padding: 10px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; }
+#auth-page button:hover { background: #2563eb; }
+#auth-page .toggle { text-align: center; margin-top: 12px; font-size: 13px; color: #6b7280; cursor: pointer; }
+#auth-page .toggle:hover { color: #3b82f6; }
+
+/* Cards */
+.card { background: white; border-radius: 8px; padding: 16px; margin-bottom: 12px; border: 1px solid #e5e7eb; }
+.card h3 { font-size: 15px; margin-bottom: 8px; }
+.card-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
+.card-row:last-child { border-bottom: none; }
+
+/* Grid */
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+.stat-card { background: white; border-radius: 8px; padding: 16px; border: 1px solid #e5e7eb; text-align: center; }
+.stat-card .value { font-size: 24px; font-weight: 700; color: #1f2937; }
+.stat-card .label { font-size: 12px; color: #6b7280; margin-top: 4px; }
+
+/* Badges */
+.badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+.badge-green { background: #d1fae5; color: #065f46; }
+.badge-red { background: #fee2e2; color: #991b1b; }
+.badge-blue { background: #dbeafe; color: #1e40af; }
+.badge-yellow { background: #fef3c7; color: #92400e; }
+.badge-gray { background: #f3f4f6; color: #4b5563; }
+
+/* Buttons */
+.btn { padding: 6px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; }
+.btn-blue { background: #3b82f6; color: white; }
+.btn-green { background: #10b981; color: white; }
+.btn-red { background: #ef4444; color: white; }
+.btn-gray { background: #e5e7eb; color: #374151; }
+.btn:hover { opacity: 0.9; }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+
+/* Section header */
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.section-header h2 { font-size: 18px; }
+
+/* Forms */
+.form-group { margin-bottom: 10px; }
+.form-group label { display: block; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 4px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; }
+.form-group textarea { resize: vertical; min-height: 60px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* Modal */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.5); display: flex; align-items: center; justify-content: center; z-index: 200; }
+.modal { background: white; border-radius: 12px; padding: 24px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
+.modal h3 { margin-bottom: 16px; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+
+/* Comments */
+.comment { padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
+.comment .meta { font-size: 11px; color: #9ca3af; }
+.comment .author { font-weight: 600; color: #374151; }
+.comment.system { background: #f9fafb; padding: 8px; border-radius: 6px; margin: 4px 0; font-size: 12px; color: #6b7280; font-style: italic; }
+
+/* Toast */
+#toast { position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: white; padding: 12px 20px; border-radius: 8px; z-index: 300; font-size: 13px; transition: opacity .3s; }
+
+/* Ledger */
+.ledger-section { margin-bottom: 16px; }
+.ledger-section h3 { font-size: 14px; color: #6b7280; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid; }
+.ledger-section.owe h3 { border-color: #ef4444; color: #991b1b; }
+.ledger-section.owed h3 { border-color: #10b981; color: #065f46; }
+
+/* Amount */
+.amount { font-weight: 700; }
+.amount.positive { color: #059669; }
+.amount.negative { color: #dc2626; }
+</style>
+</head>
+<body>
+
+<!-- AUTH PAGE -->
+<div id="auth-page">
+  <h2 id="auth-title">Login</h2>
+  <div id="auth-error" style="color:#dc2626;font-size:13px;margin-bottom:10px;" class="hidden"></div>
+  <div id="signup-fields" class="hidden">
+    <input id="a-fname" placeholder="First Name">
+    <input id="a-lname" placeholder="Last Name">
+    <input id="a-phone" placeholder="Phone (+923001234567)">
+    <input id="a-dob" type="date" placeholder="Date of Birth">
+  </div>
+  <input id="a-email" placeholder="Email" value="arslan@test.com">
+  <input id="a-pass" type="password" placeholder="Password" value="password123">
+  <div id="signup-pass2" class="hidden">
+    <input id="a-pass2" type="password" placeholder="Confirm Password">
+  </div>
+  <div id="confirm-fields" class="hidden">
+    <input id="a-confirm-token" placeholder="Confirmation Token">
+  </div>
+  <div id="forgot-fields" class="hidden">
+    <input id="a-reset-token" placeholder="Reset Token (from email)">
+    <input id="a-new-pass" type="password" placeholder="New Password">
+    <input id="a-new-pass2" type="password" placeholder="Confirm New Password">
+  </div>
+  <button id="auth-submit" onclick="handleAuth()">Login</button>
+  <div style="display:flex;justify-content:center;gap:16px;margin-top:12px;font-size:13px;">
+    <span class="toggle" onclick="toggleAuthMode()"><strong id="toggle-label">Sign Up</strong></span>
+    <span class="toggle" onclick="showForgotPassword()"><strong>Forgot Password?</strong></span>
+    <span class="toggle" id="confirm-toggle" onclick="showConfirmAccount()"><strong>Confirm Account</strong></span>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="main-app" class="hidden">
+  <nav>
+    <div class="tabs">
+      <button class="active" onclick="showTab('dashboard')">Dashboard</button>
+      <button onclick="showTab('expenses')">Expenses</button>
+      <button onclick="showTab('friends')">Friends</button>
+      <button onclick="showTab('groups')">Groups</button>
+      <button onclick="showTab('ledger')">Ledger</button>
+      <button onclick="showTab('notifications')">Notifications <span id="notif-badge" class="badge badge-red hidden">0</span></button>
+    </div>
+    <div class="user-info">
+      <strong id="nav-user"></strong>
+      <button id="logoutBtn" class="btn btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+  <div id="app">
+    <div id="tab-dashboard"></div>
+    <div id="tab-expenses" class="hidden"></div>
+    <div id="tab-friends" class="hidden"></div>
+    <div id="tab-groups" class="hidden"></div>
+    <div id="tab-ledger" class="hidden"></div>
+    <div id="tab-notifications" class="hidden"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="hidden"></div>
+
+<script>
+const API = 'http://localhost:3001/api/v1';
+let TOKEN = localStorage.getItem('jwt_token');
+let CURRENT_USER = null;
+let isSignup = false;
+
+// ============ API HELPERS ============
+async function api(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+  if (TOKEN) headers['Authorization'] = `Bearer ${TOKEN}`;
+  const res = await fetch(`${API}${path}`, { ...opts, headers });
+  const authHeader = res.headers.get('authorization');
+  if (authHeader) { TOKEN = authHeader.replace('Bearer ', ''); localStorage.setItem('jwt_token', TOKEN); }
+  if (res.status === 204) return null;
+  const data = await res.json().catch(() => null);
+  if (!res.ok) { const msg = data?.errors?.join(', ') || data?.error || `Error ${res.status}`; throw new Error(msg); }
+  return data;
+}
+function toast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.background = isError ? '#dc2626' : '#1f2937';
+  t.classList.remove('hidden');
+  setTimeout(() => t.classList.add('hidden'), 3000);
+}
+
+// ============ AUTH ============
+let authMode = 'login'; // login, signup, forgot, reset, confirm
+
+function setAuthMode(mode) {
+  authMode = mode;
+  document.getElementById('signup-fields').classList.toggle('hidden', mode !== 'signup');
+  document.getElementById('signup-pass2').classList.toggle('hidden', mode !== 'signup');
+  document.getElementById('confirm-fields').classList.toggle('hidden', mode !== 'confirm');
+  document.getElementById('forgot-fields').classList.toggle('hidden', mode !== 'reset');
+  document.getElementById('a-pass').classList.toggle('hidden', mode === 'confirm' || mode === 'forgot' || mode === 'reset');
+  const titles = { login: 'Login', signup: 'Sign Up', forgot: 'Forgot Password', reset: 'Reset Password', confirm: 'Confirm Account' };
+  document.getElementById('auth-title').textContent = titles[mode];
+  document.getElementById('auth-submit').textContent = titles[mode];
+}
+
+function toggleAuthMode() { setAuthMode(authMode === 'login' ? 'signup' : 'login'); }
+function showForgotPassword() { setAuthMode('forgot'); }
+function showConfirmAccount() { setAuthMode('confirm'); }
+
+async function handleAuth() {
+  const err = document.getElementById('auth-error');
+  err.classList.add('hidden');
+  try {
+    if (authMode === 'signup') {
+      await api('/signup', { method: 'POST', body: JSON.stringify({ user: {
+        email: document.getElementById('a-email').value, password: document.getElementById('a-pass').value,
+        password_confirmation: document.getElementById('a-pass2').value, first_name: document.getElementById('a-fname').value,
+        last_name: document.getElementById('a-lname').value, phone_number: document.getElementById('a-phone').value,
+        date_of_birth: document.getElementById('a-dob').value
+      }})});
+      toast('Signed up! Get confirmation token from rails console, then click Confirm Account.');
+      setAuthMode('confirm');
+    } else if (authMode === 'forgot') {
+      await api('/password', { method: 'POST', body: JSON.stringify({ user: { email: document.getElementById('a-email').value } }) });
+      toast('Reset instructions sent! Get token from rails console, then enter below.');
+      setAuthMode('reset');
+    } else if (authMode === 'reset') {
+      await api('/password', { method: 'PATCH', body: JSON.stringify({ user: {
+        reset_password_token: document.getElementById('a-reset-token').value,
+        password: document.getElementById('a-new-pass').value,
+        password_confirmation: document.getElementById('a-new-pass2').value
+      }})});
+      toast('Password reset! Now login with your new password.');
+      setAuthMode('login');
+    } else if (authMode === 'confirm') {
+      const token = document.getElementById('a-confirm-token').value;
+      await api(`/confirmation?confirmation_token=${token}`);
+      toast('Account confirmed! Now login.');
+      setAuthMode('login');
+    } else {
+      await api('/login', { method: 'POST', body: JSON.stringify({ user: {
+        email: document.getElementById('a-email').value, password: document.getElementById('a-pass').value
+      }})});
+      await initApp();
+    }
+  } catch (e) { err.textContent = e.message; err.classList.remove('hidden'); }
+}
+function logout() { TOKEN = null; localStorage.removeItem('jwt_token'); location.reload(); }
+
+// ============ APP INIT ============
+async function initApp() {
+  try {
+    const res = await api('/users/me');
+    CURRENT_USER = res.data.attributes;
+    CURRENT_USER.id = res.data.id;
+    document.getElementById('auth-page').classList.add('hidden');
+    document.getElementById('main-app').classList.remove('hidden');
+    document.getElementById('nav-user').textContent = `${CURRENT_USER.initials} ${CURRENT_USER.full_name}`;
+    showTab('dashboard');
+  } catch { document.getElementById('auth-page').classList.remove('hidden'); document.getElementById('main-app').classList.add('hidden'); }
+}
+
+// ============ TABS ============
+function showTab(name) {
+  document.querySelectorAll('[id^="tab-"]').forEach(t => t.classList.add('hidden'));
+  document.getElementById(`tab-${name}`).classList.remove('hidden');
+  document.querySelectorAll('nav .tabs button').forEach(b => b.classList.remove('active'));
+  event?.target?.classList?.add('active');
+  const loaders = { dashboard: loadDashboard, expenses: loadExpenses, friends: loadFriends, groups: loadGroups, ledger: loadLedger, notifications: loadNotifications };
+  loaders[name]?.();
+}
+
+// ============ DASHBOARD ============
+async function loadDashboard() {
+  const d = await api('/dashboard');
+  const el = document.getElementById('tab-dashboard');
+  el.innerHTML = `
+    <div class="grid-3">
+      <div class="stat-card"><div class="value">Rs. ${Number(d.total_expenses).toLocaleString()}</div><div class="label">Total Expenses</div></div>
+      <div class="stat-card"><div class="value">Rs. ${Number(d.current_month_total).toLocaleString()}</div><div class="label">This Month</div></div>
+      <div class="stat-card"><div class="value" style="color:#059669">Rs. ${Number(d.ledger_summary?.total_owed_to_me || 0).toLocaleString()}</div><div class="label">Owed to You</div></div>
+    </div>
+    <div class="grid-3">
+      <div class="stat-card"><div class="value" style="color:#dc2626">Rs. ${Number(d.ledger_summary?.total_i_owe || 0).toLocaleString()}</div><div class="label">You Owe</div></div>
+      <div class="stat-card" style="cursor:pointer" onclick="showTab('expenses')"><div class="value">📋</div><div class="label">View All Expenses →</div></div>
+      <div class="stat-card" style="cursor:pointer" onclick="showTab('ledger')"><div class="value">💰</div><div class="label">View Full Ledger →</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div>
+        <div class="section-header"><h2>Recent Expenses</h2></div>
+        ${(d.recent_expenses?.data || []).map(e => `
+          <div class="card-row" style="cursor:pointer" onclick="viewExpense(${e.id})">
+            <div><strong>${e.attributes.title}</strong><br><span style="font-size:11px;color:#9ca3af">${e.attributes.start_date}</span></div>
+            <div class="amount">Rs. ${Number(e.attributes.amount).toLocaleString()}</div>
+          </div>
+        `).join('') || '<div style="color:#9ca3af;font-size:13px">No expenses yet</div>'}
+      </div>
+      <div>
+        <div class="section-header"><h2>Recent Ledger</h2></div>
+        ${(d.recent_ledger_activity || []).map(r => `
+          <div class="card-row">
+            <div><span style="font-size:12px">${r.from.initials} → ${r.to.initials}</span><br><span style="font-size:11px;color:#9ca3af">${r.expense_title}</span></div>
+            <div><span class="amount ${r.settled?'positive':'negative'}">Rs. ${Number(r.amount).toLocaleString()}</span>
+            ${r.settled?'<span class="badge badge-green">Settled</span>':'<span class="badge badge-yellow">Pending</span>'}</div>
+          </div>
+        `).join('') || '<div style="color:#9ca3af;font-size:13px">No ledger activity</div>'}
+      </div>
+    </div>`;
+}
+
+// ============ EXPENSES ============
+async function loadExpenses() {
+  const d = await api('/expenses?type=individual');
+  const el = document.getElementById('tab-expenses');
+  el.innerHTML = `
+    <div class="section-header"><h2>My Expenses</h2><button class="btn btn-blue" onclick="showCreateExpenseModal()">+ Add Expense</button></div>
+    <div style="margin-bottom:12px;font-size:12px;color:#6b7280">${d.meta.total_count} expenses — Page ${d.meta.current_page} of ${d.meta.total_pages}</div>
+    ${d.data.length ? d.data.map(e => {
+      const a = e.attributes;
+      const catName = d.included?.find(i => i.type === 'category' && i.id === String(a.category_id))?.attributes?.name || '';
+      return `<div class="card" style="cursor:pointer" onclick="viewExpense(${e.id})">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <h3>${a.title}</h3>
+            <span style="font-size:12px;color:#6b7280">${a.start_date}</span>
+            ${catName ? `<span class="badge badge-gray" style="margin-left:6px">${catName}</span>` : ''}
+          </div>
+          <div class="amount" style="font-size:18px">Rs. ${Number(a.amount).toLocaleString()}</div>
+        </div>
+        ${a.notes ? `<div style="margin-top:4px;font-size:12px;color:#9ca3af">${a.notes}</div>` : ''}
+      </div>`;
+    }).join('') : '<div class="card" style="text-align:center;color:#9ca3af">No individual expenses yet. Click + Add Expense to create one.</div>'}`;
+}
+
+async function viewExpense(id) {
+  const d = await api(`/expenses/${id}`);
+  const a = d.data.attributes;
+  let comments = [];
+  try { const c = await api(`/expenses/${id}/comments`); comments = c.data || []; } catch {}
+
+  document.getElementById('modal-content').innerHTML = `
+    <h3>${a.title}</h3>
+    <div style="display:flex;justify-content:space-between;margin:12px 0">
+      <div><span class="badge badge-gray">${a.start_date}</span> ${a.shared?'<span class="badge badge-blue">Shared</span>':''}</div>
+      <div class="amount" style="font-size:20px">Rs. ${Number(a.amount).toLocaleString()}</div>
+    </div>
+    ${a.notes ? `<p style="color:#6b7280;font-size:13px;margin-bottom:12px">${a.notes}</p>` : ''}
+    ${a.participants?.length ? `
+      <h4 style="font-size:13px;color:#6b7280;margin-bottom:6px">Participants</h4>
+      ${a.participants.map(p => `
+        <div class="card-row" style="font-size:13px">
+          <div><strong>${p.user.initials}</strong> ${p.user.full_name}</div>
+          <div>paid: Rs.${p.paid_share} | owes: Rs.${p.owed_share}</div>
+        </div>
+      `).join('')}
+    ` : ''}
+    ${a.repayments?.length ? `
+      <h4 style="font-size:13px;color:#6b7280;margin:12px 0 6px">Repayments</h4>
+      ${a.repayments.map(r => `
+        <div class="card-row" style="font-size:13px">
+          <div>${r.from.initials} → ${r.to.initials}</div>
+          <div>Rs. ${r.amount} ${r.settled?'<span class="badge badge-green">Settled</span>':'<button class="btn btn-sm btn-green" onclick="settleRepayment('+r.id+')">Settle</button>'}</div>
+        </div>
+      `).join('')}
+    ` : ''}
+    <h4 style="font-size:13px;color:#6b7280;margin:16px 0 8px">💬 Thread (${comments.length} messages)</h4>
+    <div style="max-height:200px;overflow-y:auto;margin-bottom:12px">
+      ${comments.map(c => {
+        const ca = c.attributes;
+        return ca.comment_type === 'system_comment'
+          ? `<div class="comment system">🔔 ${ca.content}</div>`
+          : `<div class="comment"><span class="author">${ca.user.initials}</span> ${ca.content}<div class="meta">${new Date(ca.created_at).toLocaleString()}</div></div>`;
+      }).join('') || '<div style="color:#9ca3af;font-size:12px">No comments yet</div>'}
+    </div>
+    <div style="display:flex;gap:8px">
+      <input id="comment-input" placeholder="Write a comment..." style="flex:1;padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px">
+      <button class="btn btn-blue" onclick="addComment(${id})">Send</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="showEditExpenseModal(${id}, '${a.title.replace(/'/g,"\\'")}', '${a.amount}', '${a.start_date}', '${a.notes||''}')">Edit</button>
+      <button class="btn btn-red" onclick="deleteExpense(${id})">Delete</button>
+      <button class="btn btn-gray" onclick="closeModal()">Close</button>
+    </div>`;
+  document.getElementById('modal').classList.remove('hidden');
+}
+
+async function addComment(expenseId) {
+  const input = document.getElementById('comment-input');
+  if (!input.value.trim()) return;
+  try { await api(`/expenses/${expenseId}/comments`, { method: 'POST', body: JSON.stringify({ content: input.value }) }); toast('Comment added'); viewExpense(expenseId); }
+  catch (e) { toast(e.message, true); }
+}
+
+async function settleRepayment(repaymentId) {
+  try { await api(`/repayments/${repaymentId}/settle`, { method: 'PATCH' }); toast('Settled!'); closeModal(); loadExpenses(); }
+  catch (e) { toast(e.message, true); }
+}
+
+function showEditExpenseModal(id, title, amount, date, notes) {
+  document.getElementById('modal-content').innerHTML = `
+    <h3>Edit Expense</h3>
+    <div class="form-group"><label>Title</label><input id="ee-title" value="${title}"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Amount (Rs.)</label><input id="ee-amount" type="number" step="0.01" value="${amount}"></div>
+      <div class="form-group"><label>Date</label><input id="ee-date" type="date" value="${date}"></div>
+    </div>
+    <div class="form-group"><label>Notes</label><textarea id="ee-notes">${notes}</textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="viewExpense(${id})">Cancel</button>
+      <button class="btn btn-blue" onclick="updateExpense(${id})">Save</button>
+    </div>`;
+}
+
+async function updateExpense(id) {
+  try {
+    await api(`/expenses/${id}`, { method: 'PATCH', body: JSON.stringify({ expense: {
+      title: document.getElementById('ee-title').value,
+      amount: document.getElementById('ee-amount').value,
+      start_date: document.getElementById('ee-date').value,
+      notes: document.getElementById('ee-notes').value || null
+    }})});
+    toast('Expense updated!'); viewExpense(id);
+  } catch (e) { toast(e.message, true); }
+}
+
+async function deleteExpense(id) {
+  if (!confirm('Delete this expense? (soft delete — can be recovered)')) return;
+  try { await api(`/expenses/${id}`, { method: 'DELETE' }); toast('Expense deleted'); closeModal(); loadExpenses(); }
+  catch (e) { toast(e.message, true); }
+}
+
+async function showCreateExpenseModal() {
+  const cats = await api('/categories');
+  const friends = await api('/friends');
+  const groups = await api('/groups');
+  const subcats = cats.included || [];
+
+  document.getElementById('modal-content').innerHTML = `
+    <h3>New Expense</h3>
+    <div class="form-group"><label>Title</label><input id="ne-title" placeholder="e.g. Lunch"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Amount (Rs.)</label><input id="ne-amount" type="number" step="0.01" placeholder="0.00"></div>
+      <div class="form-group"><label>Date</label><input id="ne-date" type="date" value="${new Date().toISOString().split('T')[0]}"></div>
+    </div>
+    <div class="form-group"><label>Category</label><select id="ne-cat">
+      ${subcats.map(c => `<option value="${c.id}">${c.attributes.name}</option>`).join('')}
+    </select></div>
+    <div class="form-group"><label>Notes</label><textarea id="ne-notes" placeholder="Optional notes..."></textarea></div>
+    <hr style="margin:16px 0">
+    <div class="form-group"><label><input type="checkbox" id="ne-shared" onchange="toggleSharedFields()"> Share this expense</label></div>
+    <div id="shared-fields" class="hidden">
+      <div class="form-group"><label>Split with friends</label>
+        <div id="friend-checkboxes">${friends.data.map(f => {
+          const fa = f.attributes.friend;
+          return `<label style="display:block;margin:4px 0;font-size:13px"><input type="checkbox" class="friend-cb" value="${fa.id}"> ${fa.full_name} (${fa.initials})</label>`;
+        }).join('')}</div>
+      </div>
+      <div class="form-group"><label>Group (optional)</label><select id="ne-group">
+        <option value="">No group</option>
+        ${groups.data.map(g => `<option value="${g.id}">${g.attributes.name}</option>`).join('')}
+      </select></div>
+      <div class="form-group"><label>Or create new group</label><input id="ne-newgroup" placeholder="New group name (leave empty to skip)"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-blue" onclick="createExpense()">Create Expense</button>
+    </div>`;
+  document.getElementById('modal').classList.remove('hidden');
+}
+
+function toggleSharedFields() { document.getElementById('shared-fields').classList.toggle('hidden', !document.getElementById('ne-shared').checked); }
+
+async function createExpense() {
+  const isShared = document.getElementById('ne-shared').checked;
+  const body = { expense: {
+    title: document.getElementById('ne-title').value,
+    amount: document.getElementById('ne-amount').value,
+    category_id: document.getElementById('ne-cat').value,
+    start_date: document.getElementById('ne-date').value,
+    notes: document.getElementById('ne-notes').value || null
+  }};
+
+  if (isShared) {
+    const friendIds = [...document.querySelectorAll('.friend-cb:checked')].map(cb => parseInt(cb.value));
+    const allIds = [parseInt(CURRENT_USER.id), ...friendIds];
+    body.expense.split_equally = true;
+    body.expense.participants = allIds.map(id => ({ user_id: id }));
+    const gid = document.getElementById('ne-group').value;
+    if (gid) body.expense.group_id = parseInt(gid);
+    const newGroup = document.getElementById('ne-newgroup').value;
+    if (newGroup) body.expense.new_group = { name: newGroup, group_type: 'other' };
+  }
+
+  try { await api('/expenses', { method: 'POST', body: JSON.stringify(body) }); toast('Expense created!'); closeModal(); loadExpenses(); }
+  catch (e) { toast(e.message, true); }
+}
+
+// ============ FRIENDS ============
+async function loadFriends() {
+  const friends = await api('/friends');
+  let pending = [];
+  try { pending = (await api('/friends/requests')).data || []; } catch {}
+
+  const el = document.getElementById('tab-friends');
+  el.innerHTML = `
+    <div class="section-header"><h2>Friends</h2><button class="btn btn-blue" onclick="showAddFriendModal()">+ Add Friend</button></div>
+    ${pending.length ? `
+      <div class="card" style="border-color:#fbbf24">
+        <h3>Pending Requests (${pending.length})</h3>
+        ${pending.map(p => `
+          <div class="card-row">
+            <div><strong>${p.attributes.friend.initials}</strong> ${p.attributes.friend.full_name}</div>
+            <div>
+              <button class="btn btn-sm btn-green" onclick="acceptFriend(${p.id})">Accept</button>
+              <button class="btn btn-sm btn-red" onclick="rejectFriend(${p.id})">Reject</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    ` : ''}
+    ${friends.data.map(f => {
+      const fa = f.attributes;
+      return `<div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#dbeafe;color:#1e40af;font-weight:700;font-size:14px;margin-right:10px">${fa.friend.initials}</div>
+            <strong>${fa.friend.full_name}</strong>
+          </div>
+          <button class="btn btn-sm btn-red" onclick="removeFriend(${f.id})">Remove</button>
+        </div>
+      </div>`;
+    }).join('')}`;
+}
+
+async function showAddFriendModal() {
+  const users = await api('/users/search');
+  document.getElementById('modal-content').innerHTML = `
+    <h3>Add Friend</h3>
+    ${users.data.length ? `
+      <div class="form-group"><label>Select a user</label>
+        <select id="af-id" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:14px">
+          <option value="">-- Choose a person --</option>
+          ${users.data.map(u => `<option value="${u.id}">${u.attributes.full_name} (${u.attributes.initials})</option>`).join('')}
+        </select>
+      </div>
+    ` : '<p style="color:#9ca3af;margin:12px 0">No users available to add as friends.</p>'}
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="closeModal()">Cancel</button>
+      ${users.data.length ? '<button class="btn btn-blue" onclick="sendFriendRequest()">Send Request</button>' : ''}
+    </div>`;
+  document.getElementById('modal').classList.remove('hidden');
+}
+
+async function sendFriendRequest() {
+  const id = document.getElementById('af-id').value;
+  if (!id) { toast('Select a person first', true); return; }
+  try { await api('/friends', { method: 'POST', body: JSON.stringify({ friend_id: id }) }); toast('Request sent!'); closeModal(); loadFriends(); }
+  catch (e) { toast(e.message, true); }
+}
+async function acceptFriend(id) { try { await api(`/friends/${id}/accept`, { method: 'PATCH' }); toast('Accepted!'); loadFriends(); } catch (e) { toast(e.message, true); } }
+async function rejectFriend(id) { try { await api(`/friends/${id}/reject`, { method: 'PATCH' }); toast('Rejected'); loadFriends(); } catch (e) { toast(e.message, true); } }
+async function removeFriend(id) { if(!confirm('Remove this friend?')) return; try { await api(`/friends/${id}`, { method: 'DELETE' }); toast('Removed'); loadFriends(); } catch (e) { toast(e.message, true); } }
+
+// ============ GROUPS ============
+async function loadGroups() {
+  const d = await api('/groups');
+  const el = document.getElementById('tab-groups');
+  el.innerHTML = `
+    <div class="section-header"><h2>Groups</h2><button class="btn btn-blue" onclick="showCreateGroupModal()">+ Create Group</button></div>
+    ${d.data.map(g => {
+      const a = g.attributes;
+      return `<div class="card" style="cursor:pointer" onclick="viewGroup(${g.id})">
+        <div style="display:flex;justify-content:space-between">
+          <div><h3>${a.name}</h3><span class="badge badge-gray">${a.group_type}</span> <span style="font-size:12px;color:#6b7280">${a.user_count} members</span></div>
+          <div style="font-size:12px;color:#9ca3af">${a.users.map(m=>m.initials).join(', ')}</div>
+        </div>
+      </div>`;
+    }).join('')}`;
+}
+
+async function viewGroup(id) {
+  const d = await api(`/groups/${id}`);
+  const a = d.data.attributes;
+  const expenses = d.expenses?.data || [];
+
+  const friends = await api('/friends');
+  const cats = await api('/categories');
+  const subcats = cats.included || [];
+  const memberIds = a.users.map(m => m.id);
+  const nonMembers = friends.data.filter(f => !memberIds.includes(f.attributes.friend.id));
+
+  document.getElementById('modal-content').innerHTML = `
+    <h3>${a.name} <span class="badge badge-gray">${a.group_type}</span></h3>
+
+    <h4 style="font-size:13px;color:#6b7280;margin:12px 0 6px">Members (${a.user_count})</h4>
+    ${a.users.map(m => `
+      <div class="card-row">
+        <div><span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#dbeafe;color:#1e40af;font-weight:700;font-size:11px;margin-right:8px">${m.initials}</span>${m.full_name}</div>
+        <div>
+          ${m.id === a.created_by.id ? '<span class="badge badge-yellow">Creator</span>' : `<button class="btn btn-sm btn-red" onclick="removeGroupMember(${id}, ${m.id})">Remove</button>`}
+        </div>
+      </div>
+    `).join('')}
+
+    ${nonMembers.length ? `
+      <div style="margin:12px 0;padding:12px;background:#f9fafb;border-radius:8px">
+        <h4 style="font-size:13px;color:#6b7280;margin-bottom:6px">Add a friend</h4>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          ${nonMembers.map(f => {
+            const fa = f.attributes.friend;
+            return `<button class="btn btn-sm btn-blue" onclick="addGroupMember(${id}, ${fa.id})">+ ${fa.full_name}</button>`;
+          }).join('')}
+        </div>
+      </div>
+    ` : ''}
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 6px">
+      <h4 style="font-size:13px;color:#6b7280">Expenses (${expenses.length})</h4>
+      <button class="btn btn-sm btn-blue" onclick="document.getElementById('grp-exp-form').classList.toggle('hidden')">+ Add Expense</button>
+    </div>
+    <div id="grp-exp-form" class="hidden" style="background:#f9fafb;border-radius:8px;padding:12px;margin-bottom:12px">
+      <div class="form-row">
+        <div class="form-group"><label>Title</label><input id="ge-title" placeholder="e.g. Dinner"></div>
+        <div class="form-group"><label>Amount</label><input id="ge-amount" type="number" step="0.01" placeholder="0.00"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Category</label><select id="ge-cat">
+          ${subcats.map(c => '<option value="'+c.id+'">'+c.attributes.name+'</option>').join('')}
+        </select></div>
+        <div class="form-group"><label>Date</label><input id="ge-date" type="date" value="${new Date().toISOString().split('T')[0]}"></div>
+      </div>
+      <div style="text-align:right;margin-top:8px">
+        <button class="btn btn-gray btn-sm" onclick="document.getElementById('grp-exp-form').classList.add('hidden')">Cancel</button>
+        <button class="btn btn-blue btn-sm" onclick="createGroupExpense(${id})">Create (split equally)</button>
+      </div>
+    </div>
+    ${expenses.map(e => `
+      <div class="card-row" style="cursor:pointer" onclick="closeModal();setTimeout(()=>viewExpense(${e.id}),100)">
+        <div><strong>${e.attributes.title}</strong><br><span style="font-size:11px;color:#9ca3af">${e.attributes.start_date}</span></div>
+        <div class="amount">Rs. ${Number(e.attributes.amount).toLocaleString()}</div>
+      </div>
+    `).join('') || '<div style="color:#9ca3af;font-size:12px">No expenses in this group yet</div>'}
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="showEditGroupModal(${id}, '${a.name.replace(/'/g,"\\'")}', '${a.group_type}')">Edit</button>
+      <button class="btn btn-red" onclick="deleteGroup(${id})">Delete Group</button>
+      <button class="btn btn-gray" onclick="closeModal()">Close</button>
+    </div>`;
+  document.getElementById('modal').classList.remove('hidden');
+}
+
+async function showCreateGroupModal() {
+  const friends = await api('/friends');
+  document.getElementById('modal-content').innerHTML = `
+    <h3>Create Group</h3>
+    <div class="form-group"><label>Group Name</label><input id="cg-name" placeholder="e.g. Office Dinner"></div>
+    <div class="form-group"><label>Type</label><select id="cg-type">
+      <option value="other">Other</option><option value="home">Home</option><option value="trip">Trip</option><option value="couple">Couple</option><option value="apartment">Apartment</option>
+    </select></div>
+    <div class="form-group"><label>Add Friends</label>
+      <div>${friends.data.map(f => {
+        const fa = f.attributes.friend;
+        return `<label style="display:block;margin:4px 0;font-size:13px"><input type="checkbox" class="gf-cb" value="${fa.id}"> ${fa.full_name}</label>`;
+      }).join('')}</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-blue" onclick="createGroup()">Create</button>
+    </div>`;
+  document.getElementById('modal').classList.remove('hidden');
+}
+
+function showEditGroupModal(id, name, groupType) {
+  document.getElementById('modal-content').innerHTML = `
+    <h3>Edit Group</h3>
+    <div class="form-group"><label>Group Name</label><input id="eg-name" value="${name}"></div>
+    <div class="form-group"><label>Type</label><select id="eg-type">
+      <option value="other" ${groupType==='other'?'selected':''}>Other</option>
+      <option value="home" ${groupType==='home'?'selected':''}>Home</option>
+      <option value="trip" ${groupType==='trip'?'selected':''}>Trip</option>
+      <option value="couple" ${groupType==='couple'?'selected':''}>Couple</option>
+      <option value="apartment" ${groupType==='apartment'?'selected':''}>Apartment</option>
+    </select></div>
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="viewGroup(${id})">Cancel</button>
+      <button class="btn btn-blue" onclick="updateGroup(${id})">Save</button>
+    </div>`;
+}
+
+async function updateGroup(id) {
+  try {
+    await api(`/groups/${id}`, { method: 'PATCH', body: JSON.stringify({ group: {
+      name: document.getElementById('eg-name').value,
+      group_type: document.getElementById('eg-type').value
+    }})});
+    toast('Group updated!'); closeModal(); loadGroups();
+  } catch (e) { toast(e.message, true); }
+}
+
+async function deleteGroup(id) {
+  if (!confirm('Delete this group? (soft delete)')) return;
+  try { await api(`/groups/${id}`, { method: 'DELETE' }); toast('Group deleted'); closeModal(); loadGroups(); }
+  catch (e) { toast(e.message, true); }
+}
+
+async function createGroup() {
+  const memberIds = [...document.querySelectorAll('.gf-cb:checked')].map(cb => parseInt(cb.value));
+  if (memberIds.length === 0) { toast('Select at least one friend', true); return; }
+  const name = document.getElementById('cg-name').value.trim();
+  if (!name) { toast('Enter a group name', true); return; }
+  try {
+    await api('/groups', { method: 'POST', body: JSON.stringify({
+      group: { name, group_type: document.getElementById('cg-type').value },
+      member_ids: memberIds
+    })});
+    toast('Group created!'); closeModal(); loadGroups();
+  } catch (e) { toast(e.message, true); }
+}
+
+async function createGroupExpense(groupId) {
+  const title = document.getElementById('ge-title').value.trim();
+  const amount = document.getElementById('ge-amount').value;
+  if (!title || !amount) { toast('Enter title and amount', true); return; }
+  try {
+    await api('/expenses', { method: 'POST', body: JSON.stringify({ expense: {
+      title, amount, category_id: document.getElementById('ge-cat').value,
+      start_date: document.getElementById('ge-date').value,
+      group_id: groupId, split_equally: true
+    }})});
+    toast('Expense added to group!'); viewGroup(groupId);
+  } catch (e) { toast(e.message, true); }
+}
+
+async function addGroupMember(groupId, userId) {
+  try { await api(`/groups/${groupId}/members`, { method: 'POST', body: JSON.stringify({ user_id: userId }) }); toast('Member added!'); viewGroup(groupId); }
+  catch (e) { toast(e.message, true); }
+}
+
+async function removeGroupMember(groupId, userId) {
+  if (!confirm('Remove this member from the group?')) return;
+  try { await api(`/groups/${groupId}/members/${userId}`, { method: 'DELETE' }); toast('Member removed'); viewGroup(groupId); }
+  catch (e) { toast(e.message, true); }
+}
+
+// ============ LEDGER ============
+async function loadLedger() {
+  const d = await api('/ledger');
+  const el = document.getElementById('tab-ledger');
+  el.innerHTML = `
+    <div class="section-header"><h2>Ledger</h2></div>
+    <div class="grid-3" style="grid-template-columns:1fr 1fr">
+      <div class="stat-card"><div class="value" style="color:#dc2626">Rs. ${Number(d.total_i_owe).toLocaleString()}</div><div class="label">Total I Owe</div></div>
+      <div class="stat-card"><div class="value" style="color:#059669">Rs. ${Number(d.total_owed_to_me).toLocaleString()}</div><div class="label">Total Owed to Me</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="ledger-section owe">
+        <h3>💸 I Owe</h3>
+        ${d.i_owe.length ? d.i_owe.map(e => `
+          <div class="card" style="cursor:pointer" onclick="viewLedgerDetail(${e.id})">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div><strong>${e.initials}</strong> ${e.full_name}</div>
+              <div class="amount negative">Rs. ${Number(e.amount).toLocaleString()}</div>
+            </div>
+          </div>
+        `).join('') : '<div style="color:#9ca3af;font-size:13px;padding:12px">You don\'t owe anyone 🎉</div>'}
+      </div>
+      <div class="ledger-section owed">
+        <h3>💰 Owed to Me</h3>
+        ${d.owed_to_me.length ? d.owed_to_me.map(e => `
+          <div class="card" style="cursor:pointer" onclick="viewLedgerDetail(${e.id})">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div><strong>${e.initials}</strong> ${e.full_name}</div>
+              <div class="amount positive">Rs. ${Number(e.amount).toLocaleString()}</div>
+            </div>
+          </div>
+        `).join('') : '<div style="color:#9ca3af;font-size:13px;padding:12px">Nobody owes you money</div>'}
+      </div>
+    </div>`;
+}
+
+async function viewLedgerDetail(friendId) {
+  const d = await api(`/ledger/${friendId}`);
+  document.getElementById('modal-content').innerHTML = `
+    <h3>Ledger with ${d.friend.full_name} (${d.friend.initials})</h3>
+    <div class="grid-3" style="grid-template-columns:1fr 1fr 1fr;margin:12px 0">
+      <div class="stat-card"><div class="value" style="font-size:16px;color:#dc2626">Rs. ${Number(d.total_i_owe_them).toLocaleString()}</div><div class="label">I Owe Them</div></div>
+      <div class="stat-card"><div class="value" style="font-size:16px;color:#059669">Rs. ${Number(d.total_they_owe_me).toLocaleString()}</div><div class="label">They Owe Me</div></div>
+      <div class="stat-card"><div class="value" style="font-size:16px">Rs. ${Number(d.net).toLocaleString()}</div><div class="label">Net ${d.net > 0 ? '(they owe)' : d.net < 0 ? '(I owe)' : ''}</div></div>
+    </div>
+    ${d.they_owe_me.length ? `<h4 style="color:#065f46;margin:8px 0">They owe me:</h4>${d.they_owe_me.map(r => `
+      <div class="card-row"><div>${r.expense_title}</div><div class="amount positive">Rs. ${r.amount}</div></div>
+    `).join('')}` : ''}
+    ${d.i_owe_them.length ? `<h4 style="color:#991b1b;margin:8px 0">I owe them:</h4>${d.i_owe_them.map(r => `
+      <div class="card-row"><div>${r.expense_title}</div><div class="amount negative">Rs. ${r.amount}</div></div>
+    `).join('')}` : ''}
+    <div class="modal-actions"><button class="btn btn-gray" onclick="closeModal()">Close</button></div>`;
+  document.getElementById('modal').classList.remove('hidden');
+}
+
+// ============ NOTIFICATIONS ============
+async function loadNotifications() {
+  const d = await api('/notifications');
+  const badge = document.getElementById('notif-badge');
+  if (d.meta.unread_count > 0) { badge.textContent = d.meta.unread_count; badge.classList.remove('hidden'); }
+  else { badge.classList.add('hidden'); }
+
+  const el = document.getElementById('tab-notifications');
+  el.innerHTML = `
+    <div class="section-header">
+      <h2>Notifications ${d.meta.unread_count ? `<span class="badge badge-red">${d.meta.unread_count} unread</span>` : ''}</h2>
+      ${d.meta.unread_count ? `<button class="btn btn-blue btn-sm" onclick="markAllRead()">Mark All Read</button>` : ''}
+    </div>
+    ${d.data.map(n => {
+      const a = n.attributes;
+      return `<div class="card" style="${a.read ? 'opacity:.6' : 'border-left:3px solid #3b82f6'}">
+        <div style="display:flex;justify-content:space-between">
+          <div>
+            <span class="badge badge-${a.notification_type.includes('added')?'green':a.notification_type.includes('settled')?'blue':'gray'}">${a.notification_type}</span>
+            <span style="margin-left:6px">${a.content}</span>
+          </div>
+          <span style="font-size:11px;color:#9ca3af;white-space:nowrap">${new Date(a.created_at).toLocaleDateString()}</span>
+        </div>
+      </div>`;
+    }).join('') || '<div style="color:#9ca3af;text-align:center;padding:40px">No notifications</div>'}`;
+}
+
+async function markAllRead() { try { await api('/notifications/mark_read', { method: 'PATCH' }); toast('All read'); loadNotifications(); } catch (e) { toast(e.message, true); } }
+
+// ============ MODAL ============
+function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+
+// ============ BOOT ============
+if (TOKEN) initApp();
+</script>
+</body>
+</html>

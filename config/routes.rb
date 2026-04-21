@@ -1,14 +1,57 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  devise_for :users,
+    path: "api/v1",
+    path_names: {
+      sign_in: "login",
+      sign_out: "logout",
+      registration: "signup"
+    },
+    controllers: {
+      sessions: "api/v1/sessions",
+      registrations: "api/v1/registrations",
+      passwords: "api/v1/passwords",
+      confirmations: "api/v1/confirmations"
+    },
+    defaults: { format: :json }
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
+  namespace :api do
+    namespace :v1 do
+      get "/dashboard", to: "dashboard#index"
+      resources :expenses do
+        resources :comments, only: [ :index, :create, :destroy ]
+      end
+      resources :categories, only: [ :index, :create ]
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+      resources :ledger, only: [ :index, :show ]
+      resources :repayments, only: [] do
+        member do
+          patch :settle
+        end
+      end
+      resources :notifications, only: [ :index ] do
+        collection do
+          patch :mark_read
+        end
+      end
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+      get "/users/me", to: "users#me"
+      patch "/users/me", to: "users#update_me"
+      get "/users/search", to: "users#search"
+      resources :users, only: [ :show ]
+
+      resources :groups do
+        resources :members, controller: "group_members", only: [ :create, :destroy ]
+      end
+
+      resources :friends, only: [ :index, :show, :create, :destroy ] do
+        collection do
+          get :requests, to: "friend_requests#index"
+        end
+        member do
+          patch :accept, to: "friend_requests#accept"
+          patch :reject, to: "friend_requests#reject"
+        end
+      end
+    end
+  end
 end
