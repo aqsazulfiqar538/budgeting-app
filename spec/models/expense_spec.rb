@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Expense, type: :model do
-
   describe "validations" do
     context "when all required fields are present" do
       before { @expense = build(:expense) }
@@ -363,5 +362,4 @@ RSpec.describe Expense, type: :model do
       end
     end
   end
-
 end
