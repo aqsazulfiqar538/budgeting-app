@@ -1,0 +1,6 @@
+--output-dir doc/
+--markup markdown
+app/controllers/**/*.rb
+app/models/**/*.rb
+app/serializers/**/*.rb
+app/services/**/*.rb
