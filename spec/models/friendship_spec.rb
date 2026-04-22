@@ -152,7 +152,7 @@ RSpec.describe Friendship, type: :model do
       before do
         @user1 = create(:user)
         @user2 = create(:user)
-				@user3 = create(:user)
+        @user3 = create(:user)
 
         @accepted_friendship = create(:friendship, user: @user1, friend: @user2, requester: @user1, status: :accepted)
         @pending_friendship  = create(:friendship, user: @user1, friend: @user3, requester: @user1, status: :pending)
