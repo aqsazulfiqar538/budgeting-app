@@ -12,9 +12,9 @@ class Api::V1::DashboardController < ApplicationController
         expenses.includes(
           :category,
           expense_participants: :user,
-          repayments: [:from_user, :to_user]
+          repayments: [ :from_user, :to_user ]
         ).recent.limit(5),
-        include: [:category]
+        include: [ :category ]
       ).serializable_hash,
       recent_ledger_activity: recent_ledger_activity,
       ledger_summary: LedgerService.new(current_user).summary

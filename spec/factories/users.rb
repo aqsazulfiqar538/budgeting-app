@@ -6,6 +6,6 @@ FactoryBot.define do
     password      { "password123" }
     phone_number  { "+923456789072" }
     date_of_birth { "1990-01-01" }
-    confirmed_at  { Time.current }  # needed because of Devise confirmable
+    confirmed_at  { Time.current }  # because of Devise confirmable
   end
 end

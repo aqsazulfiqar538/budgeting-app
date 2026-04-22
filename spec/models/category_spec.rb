@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Category, type: :model do
-
   describe "validations" do
     context "when name is present" do
       before { @category = build(:category, name: "Food") }
@@ -198,6 +197,7 @@ RSpec.describe Category, type: :model do
 
       it "is valid without triggering parent validation" do
         expect(@category).to be_valid
+        expect(@category.parent).to be_nil
       end
     end
   end
