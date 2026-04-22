@@ -128,26 +128,26 @@
           1,
           1,
           null,
-          1,
-          1,
+          7,
+          3,
           null,
           null,
           1,
-          0,
+          4,
           null,
           null,
           null,
           null,
           1,
-          0,
+          3,
           null,
           null,
           1,
           null,
           1,
+          32,
+          32,
           2,
-          2,
-          0,
           null,
           null,
           null
@@ -171,6 +171,53 @@
           1,
           0,
           null,
+          null
+        ]
+      },
+      "/home/dev/budgeting-app/app/models/expense_participant.rb": {
+        "lines": [
+          null,
+          null,
+          1,
+          1,
+          1,
+          null,
+          1,
+          1,
+          1,
+          null,
+          1,
+          0,
+          null,
+          null
+        ]
+      },
+      "/home/dev/budgeting-app/app/models/repayment.rb": {
+        "lines": [
+          null,
+          null,
+          1,
+          1,
+          1,
+          1,
+          null,
+          1,
+          null,
+          1,
+          null
+        ]
+      },
+      "/home/dev/budgeting-app/app/models/comment.rb": {
+        "lines": [
+          null,
+          null,
+          1,
+          1,
+          1,
+          null,
+          1,
+          null,
+          1,
           null
         ]
       },
@@ -1097,40 +1144,6 @@
         ],
         "branches": {}
       },
-      "/home/dev/budgeting-app/app/models/comment.rb": {
-        "lines": [
-          null,
-          null,
-          0,
-          0,
-          0,
-          null,
-          0,
-          null,
-          0,
-          0
-        ],
-        "branches": {}
-      },
-      "/home/dev/budgeting-app/app/models/expense_participant.rb": {
-        "lines": [
-          null,
-          null,
-          0,
-          0,
-          0,
-          null,
-          0,
-          0,
-          0,
-          null,
-          0,
-          0,
-          0,
-          0
-        ],
-        "branches": {}
-      },
       "/home/dev/budgeting-app/app/models/friendship.rb": {
         "lines": [
           null,
@@ -1253,22 +1266,6 @@
           0,
           null,
           0,
-          0,
-          0
-        ],
-        "branches": {}
-      },
-      "/home/dev/budgeting-app/app/models/repayment.rb": {
-        "lines": [
-          null,
-          null,
-          0,
-          0,
-          0,
-          0,
-          null,
-          0,
-          null,
           0,
           0
         ],
@@ -1807,6 +1804,6 @@
         "branches": {}
       }
     },
-    "timestamp": 1776866101
+    "timestamp": 1776868087
   }
 }
