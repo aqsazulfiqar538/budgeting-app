@@ -37,4 +37,14 @@ class Friendship < ApplicationRecord
       errors.add(:base, "Cannot befriend yourself")
     end
   end
+
+  def self.between(user1, user2)
+    ids = [user1.id, user2.id].sort
+    new(
+      user_id: ids[0],
+      friend_id: ids[1],
+      requested_by_id: user1.id,
+      status: :pending
+    )
+  end
 end

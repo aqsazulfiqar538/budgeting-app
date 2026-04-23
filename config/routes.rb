@@ -43,13 +43,13 @@ Rails.application.routes.draw do
         resources :members, controller: "group_members", only: [ :create, :destroy ]
       end
 
-      resources :friends, only: [ :index, :show, :create, :destroy ] do
+      resources :friendships, only: [ :index, :show, :create, :destroy ] do
         collection do
-          get :requests, to: "friend_requests#index"
+          get :requests
         end
         member do
-          patch :accept, to: "friend_requests#accept"
-          patch :reject, to: "friend_requests#reject"
+          patch :accept
+          patch :reject
         end
       end
     end

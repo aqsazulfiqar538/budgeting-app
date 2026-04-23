@@ -430,7 +430,7 @@ async function deleteExpense(id) {
 
 async function showCreateExpenseModal() {
   const cats = await api('/categories');
-  const friends = await api('/friends');
+  const friends = await api('/friendships');
   const groups = await api('/groups');
   const subcats = cats.included || [];
 
@@ -496,9 +496,9 @@ async function createExpense() {
 
 // ============ FRIENDS ============
 async function loadFriends() {
-  const friends = await api('/friends');
+  const friends = await api('/friendships');
   let pending = [];
-  try { pending = (await api('/friends/requests')).data || []; } catch {}
+  try { pending = (await api('/friendships/requests')).data || []; } catch {}
 
   const el = document.getElementById('tab-friends');
   el.innerHTML = `
@@ -553,12 +553,12 @@ async function showAddFriendModal() {
 async function sendFriendRequest() {
   const id = document.getElementById('af-id').value;
   if (!id) { toast('Select a person first', true); return; }
-  try { await api('/friends', { method: 'POST', body: JSON.stringify({ friend_id: id }) }); toast('Request sent!'); closeModal(); loadFriends(); }
+  try { await api('/friendships', { method: 'POST', body: JSON.stringify({ friend_id: id }) }); toast('Request sent!'); closeModal(); loadFriends(); }
   catch (e) { toast(e.message, true); }
 }
-async function acceptFriend(id) { try { await api(`/friends/${id}/accept`, { method: 'PATCH' }); toast('Accepted!'); loadFriends(); } catch (e) { toast(e.message, true); } }
-async function rejectFriend(id) { try { await api(`/friends/${id}/reject`, { method: 'PATCH' }); toast('Rejected'); loadFriends(); } catch (e) { toast(e.message, true); } }
-async function removeFriend(id) { if(!confirm('Remove this friend?')) return; try { await api(`/friends/${id}`, { method: 'DELETE' }); toast('Removed'); loadFriends(); } catch (e) { toast(e.message, true); } }
+async function acceptFriend(id) { try { await api(`/friendships/${id}/accept`, { method: 'PATCH' }); toast('Accepted!'); loadFriends(); } catch (e) { toast(e.message, true); } }
+async function rejectFriend(id) { try { await api(`/friendships/${id}/reject`, { method: 'PATCH' }); toast('Rejected'); loadFriends(); } catch (e) { toast(e.message, true); } }
+async function removeFriend(id) { if(!confirm('Remove this friend?')) return; try { await api(`/friendships/${id}`, { method: 'DELETE' }); toast('Removed'); loadFriends(); } catch (e) { toast(e.message, true); } }
 
 // ============ GROUPS ============
 async function loadGroups() {

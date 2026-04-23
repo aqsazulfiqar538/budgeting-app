@@ -4,14 +4,10 @@ class Api::V1::CategoriesController < ApplicationController
   skip_before_action :authenticate_user!, only: [ :index ]
 
   def index
-    categories = if current_user
-      Category.where(user_id: [ nil, current_user.id ]).active_root_categories
-              .includes(:subcategories)
-    else
-      Category.system_categories.active_root_categories.includes(:subcategories)
-    end
+    categories = Category.system_categories.active_root_categories.includes(:subcategories)
+    categories = categories.where(user_id: [ nil, current_user.id ]) if current_user
 
-    render json: CategorySerializer.new(categories, include: [ :subcategories ]).serializable_hash
+    render json: CategorySerializer.new(categories, include: [ :subcategories ]).serializable_hash # what does include do?
   end
 
   def create

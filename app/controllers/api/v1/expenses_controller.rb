@@ -55,7 +55,7 @@ class Api::V1::ExpensesController < ApplicationController
 
   def expense
     @expense ||= Expense.includes(:category, expense_participants: :user, repayments: [ :from_user, :to_user ])
-                        .find(params[:id])
+                        .find_by(id: params[:id])
   end
 
   def authorize_payer!

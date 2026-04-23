@@ -21,7 +21,7 @@ class Api::V1::CommentsController < ApplicationController
   end
 
   def destroy
-    comment = @expense.comments.find(params[:id])
+    comment = @expense.comments.find_by(id: params[:id])
 
     if comment.user_id != current_user.id
       render_error("Can only delete your own comments", status: :forbidden)
