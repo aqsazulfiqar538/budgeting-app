@@ -38,8 +38,7 @@ class Api::V1::GroupMembersController < ApplicationController
     unsettled = Repayment.where("settled = :settled AND expense_id IN (:expense_ids) AND (from_user_id = :uid OR to_user_id = :uid)",
                                 settled: false,
                                 expense_ids: group_expense_ids,
-                                uid: user.id
-                                )
+                                uid: user.id)
 
     if unsettled.exists?
       total = unsettled.sum(:amount)
