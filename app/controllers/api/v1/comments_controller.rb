@@ -5,12 +5,12 @@ class Api::V1::CommentsController < ApplicationController
   before_action :authorize_participant!, only: [ :create ]
 
   def index
-    comments = @expense.comments.where(deleted_at: nil).order(:created_at).includes(:user)
+    comments = @expense.comments.includes(:user)
     render_paginated(comments, CommentSerializer)
   end
 
   def create
-    comment = @expense.comments.new(content: params[:content], user: current_user, comment_type: :user_comment)
+    comment = @expense.comments.new(comment_params.merge(user: current_user, comment_type: :user_comment))
 
     if comment.save
       NotificationService.comment_added(comment)
@@ -28,11 +28,18 @@ class Api::V1::CommentsController < ApplicationController
       return
     end
 
-    comment.update!(deleted_at: Time.current)
+    comment.destroy
     head :no_content
+    rescue ActiveRecord::RecordNotDestroyed => e
+      render_error(e.full_messages)
+    end
   end
 
   private
+
+  def comment_params
+    params.permit(:content)
+  end
 
   def set_expense
     @expense = Expense.visible_to(current_user).find(params[:expense_id])

@@ -8,6 +8,7 @@ class Category < ApplicationRecord
   validate :parent_must_be_system_or_own, if: :parent_id?
 
   scope :system_categories, -> { where(user_id: nil) }
+  scope :active_root_categories, -> { where(active: true, parent_id: nil) }
 
   private
 

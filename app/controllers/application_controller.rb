@@ -7,6 +7,7 @@ class ApplicationController < ActionController::API
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   rescue_from ActiveRecord::RecordNotFound, with: :not_found
+  rescue_from ActiveRecord::RecordInvalid, with: :render_unprocessable
 
   protected
 
@@ -56,4 +57,9 @@ class ApplicationController < ActionController::API
   def not_found
     render_error("Record not found", status: :not_found)
   end
+
+  def render_unprocessable(e)
+    render_error(e.message, status: :unprocessable_entity)
+  end
+
 end

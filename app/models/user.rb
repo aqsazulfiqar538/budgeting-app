@@ -13,8 +13,8 @@ class User < ApplicationRecord
   has_many :friendships_as_user, class_name: "Friendship", foreign_key: :user_id, dependent: :destroy
   has_many :friendships_as_friend, class_name: "Friendship", foreign_key: :friend_id, dependent: :destroy
   has_many :group_memberships, dependent: :destroy
-  has_many :groups, through: :group_memberships
-  has_many :created_groups, class_name: "Group", foreign_key: :created_by_id, dependent: :nullify
+  has_many :groups, through: :group_memberships #groups user is a member of
+  has_many :created_groups, class_name: "Group", foreign_key: :created_by_id, dependent: :nullify #groups user created
   has_many :expense_participants, dependent: :destroy
   has_many :repayments_owed, class_name: "Repayment", foreign_key: :from_user_id, dependent: :destroy
   has_many :repayments_owing, class_name: "Repayment", foreign_key: :to_user_id, dependent: :destroy

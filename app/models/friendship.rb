@@ -14,12 +14,12 @@ class Friendship < ApplicationRecord
   scope :involving, ->(user) { where(user_id: user.id).or(where(friend_id: user.id)) }
   scope :accepted, -> { where(status: :accepted) }
 
-  # Pending requests where the given user is the recipient (not the requester)
+  # Pending requests where the given user is the recipient
   scope :pending_for, ->(user) {
     pending.involving(user).where.not(requested_by_id: user.id)
   }
 
-  # Returns the "other" user in the friendship relative to the given user
+  # Returns the "other" user in the friendship
   def other_user(current)
     current.id == user_id ? friend : user
   end

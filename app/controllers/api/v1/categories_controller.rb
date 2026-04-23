@@ -5,10 +5,10 @@ class Api::V1::CategoriesController < ApplicationController
 
   def index
     categories = if current_user
-      Category.where(user_id: [ nil, current_user.id ], active: true, parent_id: nil)
+      Category.where(user_id: [ nil, current_user.id ]).active_root_categories
               .includes(:subcategories)
     else
-      Category.system_categories.where(active: true, parent_id: nil).includes(:subcategories)
+      Category.system_categories.active_root_categories.includes(:subcategories)
     end
 
     render json: CategorySerializer.new(categories, include: [ :subcategories ]).serializable_hash
