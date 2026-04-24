@@ -13,8 +13,6 @@ class ExpenseCreationService
   end
 
   def call
-    success = true
-
     ActiveRecord::Base.transaction do
       validate_group_membership! if @group_id.present?
       validate_participants_are_friends! if shared?
@@ -23,29 +21,27 @@ class ExpenseCreationService
       validate_split_totals! if shared? && @participants_data.present? && !@split_equally
       create_repayments! if shared?
       create_system_comment!
-    rescue SplitValidationError => e
+    rescue ServiceError => e
       @errors = [ e.message ]
-      success = false
       raise ActiveRecord::Rollback
     rescue ActiveRecord::RecordInvalid => e
       @errors = e.record.errors.full_messages
-      success = false
       raise ActiveRecord::Rollback
     end
 
-    return nil unless success
-
+    return nil if @errors.any?
+    
     NotificationService.expense_created(@expense, @user) if shared? && @expense
     expense
   end
 
-  class SplitValidationError < StandardError; end
+  class ServiceError < StandardError; end
 
   private
 
   def validate_group_membership!
     group = Group.find(@group_id)
-    raise SplitValidationError, "You are not a member of this group" unless group.member?(@user)
+    raise ServiceError, "You are not a member of this group" unless group.member?(@user)
   end
 
   def validate_participants_are_friends!
@@ -57,7 +53,7 @@ class ExpenseCreationService
     unauthorized = other_ids - friend_ids
 
     if unauthorized.any?
-      raise SplitValidationError, "Users #{unauthorized.join(', ')} are not your friends"
+      raise ServiceError, "Users #{unauthorized.join(', ')} are not your friends"
     end
   end
 
@@ -113,11 +109,11 @@ class ExpenseCreationService
     total_paid = @expense.expense_participants.sum(:paid_share)
 
     if total_owed != @expense.amount
-      raise SplitValidationError, "Total owed shares (#{total_owed}) must equal expense amount (#{@expense.amount})"
+      raise ServiceError, "Total owed shares (#{total_owed}) must equal expense amount (#{@expense.amount})"
     end
 
     if total_paid != @expense.amount
-      raise SplitValidationError, "Total paid shares (#{total_paid}) must equal expense amount (#{@expense.amount})"
+      raise ServiceError, "Total paid shares (#{total_paid}) must equal expense amount (#{@expense.amount})"
     end
   end
 

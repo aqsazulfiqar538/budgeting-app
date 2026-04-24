@@ -42,14 +42,12 @@ class Expense < ApplicationRecord
   validates :start_date, presence: true
   validate :category_accessible_to_user, if: :category_id?
 
-  scope :active, -> { where(deleted_at: nil) }
   scope :recent, -> { order(start_date: :desc, created_at: :desc) }
 
-  # Returns expenses where user is the payer OR a participant
+  #expenses where user is the payer or a participant
   scope :visible_to, ->(user) {
-    active.left_joins(:expense_participants)
-      .where("expenses.user_id = :uid OR expense_participants.user_id = :uid", uid: user.id)
-      .distinct
+      left_joins(:expense_participants)
+      .where("expenses.user_id = :uid OR expense_participants.user_id = :uid", uid: user.id).distinct
   }
 
   def shared?

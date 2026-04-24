@@ -14,17 +14,17 @@ class Api::V1::ExpensesController < ApplicationController
 
   def create
     resolved_group_id = ResolveOrCreateGroupService.new(
-      user:            current_user,
-      group_id:        params.dig(:expense, :group_id),
-      group_params:    params.dig(:expense, :new_group)&.to_unsafe_h,
-      participant_ids: params.dig(:expense, :participants)&.map { |p| p[:user_id].to_i } || []
+      user: current_user,
+      group_id: expense_params[:group_id],
+      group_params: expense_params[:new_group]&.to_h,
+      participant_ids: expense_params[:participants]&.map { |p| p[:user_id].to_i } || []
     ).call
 
     service = ExpenseCreationService.new(
       user: current_user,
-      expense_params: expense_params,
-      split_equally: params.dig(:expense, :split_equally),
-      participants: params.dig(:expense, :participants)&.map(&:to_unsafe_h),
+      expense_params: core_expense_params,
+      split_equally: expense_params[:split_equally],
+      participants: expense_params[:participants]&.map(&:to_h),
       group_id: resolved_group_id
     )
 
@@ -37,7 +37,7 @@ class Api::V1::ExpensesController < ApplicationController
   end
 
   def update
-    if expense.update(expense_params)
+    if expense.update(core_expense_params)
       NotificationService.expense_updated(expense, current_user) if expense.shared?
       render json: ExpenseSerializer.new(expense, include: [ :category ]).serializable_hash
     else
@@ -63,10 +63,15 @@ class Api::V1::ExpensesController < ApplicationController
   end
 
   def expense_params
-    params.require(:expense).permit(:title, :amount, :category_id, :start_date, :end_date, :notes )
+    params.require(:expense).permit(:title, :amount, :category_id, :start_date, :end_date, :notes, :split_equally, :group_id, new_group: [ :name, :group_type ],
+                                    participants: [ :user_id, :paid_share, :owed_share ])
   end
 
   def filter_params
     params.permit(:category_id, :start_date, :end_date)
+  end
+
+  def core_expense_params
+    expense_params.except(:new_group, :participants, :split_equally, :group_id)
   end
 end
