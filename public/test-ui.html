@@ -249,7 +249,7 @@ function logout() { TOKEN = null; localStorage.removeItem('jwt_token'); location
 // ============ APP INIT ============
 async function initApp() {
   try {
-    const res = await api('/users/me');
+    const res = await api('/users/user_profile');
     CURRENT_USER = res.data.attributes;
     CURRENT_USER.id = res.data.id;
     document.getElementById('auth-page').classList.add('hidden');
@@ -582,7 +582,7 @@ async function viewGroup(id) {
   const a = d.data.attributes;
   const expenses = d.expenses?.data || [];
 
-  const friends = await api('/friends');
+  const friends = await api('/friendships');
   const cats = await api('/categories');
   const subcats = cats.included || [];
   const memberIds = a.users.map(m => m.id);
@@ -648,7 +648,7 @@ async function viewGroup(id) {
 }
 
 async function showCreateGroupModal() {
-  const friends = await api('/friends');
+  const friends = await api('/friendships');
   document.getElementById('modal-content').innerHTML = `
     <h3>Create Group</h3>
     <div class="form-group"><label>Group Name</label><input id="cg-name" placeholder="e.g. Office Dinner"></div>

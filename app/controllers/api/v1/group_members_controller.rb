@@ -6,14 +6,9 @@ class Api::V1::GroupMembersController < ApplicationController
 
   # POST /api/v1/groups/:group_id/members
   def create
-    user = User.find(params[:user_id])
+    user = User.find_by(id: params[:user_id])
+    membership = @group.group_memberships.new(user: user, adder: current_user)
 
-    unless current_user.friends.exists?(id: user.id)
-      render_error("Can only add friends to groups", status: :forbidden)
-      return
-    end
-
-    membership = @group.group_memberships.new(user: user)
     if membership.save
       NotificationService.added_to_group(@group, user, current_user)
       @group.reload
@@ -25,7 +20,7 @@ class Api::V1::GroupMembersController < ApplicationController
 
   # DELETE /api/v1/groups/:group_id/members/:id
   def destroy
-    membership = @group.group_memberships.find_by!(user_id: params[:id])
+    membership = @group.group_memberships.find_by(user_id: params[:id])
     user = membership.user
 
     if user.id == @group.created_by_id
@@ -33,16 +28,8 @@ class Api::V1::GroupMembersController < ApplicationController
       return
     end
 
-    # Check for unsettled repayments in this group's expenses
-    group_expense_ids = @group.expenses.active.pluck(:id)
-    unsettled = Repayment.where("settled = :settled AND expense_id IN (:expense_ids) AND (from_user_id = :uid OR to_user_id = :uid)",
-                                settled: false,
-                                expense_ids: group_expense_ids,
-                                uid: user.id)
-
-    if unsettled.exists?
-      total = unsettled.sum(:amount)
-      render_error("Cannot remove #{user.first_name} — they have Rs. #{total} in unsettled expenses in this group. Settle first.")
+    unless membership.removable?
+      render_error("Cannot remove #{user.first_name} — they have unsettled expenses. Settle first.")
       return
     end
 
@@ -54,7 +41,7 @@ class Api::V1::GroupMembersController < ApplicationController
   private
 
   def set_group
-    @group = Group.find(params[:group_id])
+    @group = Group.find_by(id: params[:group_id])
   end
 
   def authorize_member!

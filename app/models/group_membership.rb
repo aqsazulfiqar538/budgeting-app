@@ -21,5 +21,21 @@ class GroupMembership < ApplicationRecord
   belongs_to :group
   belongs_to :user
 
+  attr_accessor :adder
+
   validates :user_id, uniqueness: { scope: :group_id, message: "is already a member" }
+  validate :user_must_be_friend_of_adder, on: :create
+
+  def removable?
+    return false if user.id == group.created_by_id
+
+    group_expense_ids = group.expenses.active.pluck(:id)
+    Repayment.where(settled: false, expense_id: group_expense_ids)
+    .where("from_user_id = :uid OR to_user_id = :uid", uid: user.id).none?
+  end
+
+  def user_must_be_friend_of_adder
+    return unless adder
+    errors.add(:user, "must be a friend") unless adder.friends.exists?(id: user.id)
+  end
 end

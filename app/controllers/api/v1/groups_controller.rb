@@ -25,12 +25,7 @@ class Api::V1::GroupsController < ApplicationController
     user_group = current_user.created_groups.new(group_params)
 
     if user_group.save
-      user_group.group_memberships.create(user_id: current_user.id) #adding current user
-
-      member_ids.each do |uid|
-        user_group.group_memberships.create(user_id: uid) #adding valid friends
-      end
-
+      add_members(user_group, member_ids)
       user_group.reload
       render json: GroupSerializer.new(user_group).serializable_hash, status: :created
     else
@@ -86,5 +81,12 @@ class Api::V1::GroupsController < ApplicationController
     end
 
     valid_ids
+  end
+
+  def add_members(group, member_ids)
+    all_ids = [current_user.id, member_ids]
+    all_ids = all_ids.flatten
+    group.group_memberships.insert_all(all_ids.map {|uid| 
+      { user_id: uid, group_id: group.id }}, record_timestamps: true)
   end
 end
