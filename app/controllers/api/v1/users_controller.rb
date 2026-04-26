@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
 class Api::V1::UsersController < ApplicationController
-  # GET /api/v1/users/me
-  def me
+  def profile
     render json: UserSerializer.new(current_user).serializable_hash
   end
 
-  # PATCH /api/v1/users/me
-  def update_me
+  def update_profile
     if current_user.update(user_params)
       render json: UserSerializer.new(current_user).serializable_hash
     else
@@ -15,7 +13,6 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
-  # GET /api/v1/users/search?q=name
   def search
     exclude_ids = [ current_user.id ] + current_user.friends.pluck(:id)
     users = User.where.not(id: exclude_ids)
@@ -25,7 +22,6 @@ class Api::V1::UsersController < ApplicationController
     render json: PublicUserSerializer.new(users).serializable_hash
   end
 
-  # GET /api/v1/users/:id
   def show
     user = User.find(params[:id])
     render json: PublicUserSerializer.new(user).serializable_hash

@@ -33,11 +33,14 @@ Rails.application.routes.draw do
           patch :mark_read
         end
       end
-
-      get "/users/me", to: "users#me"
-      patch "/users/me", to: "users#update_me"
-      get "/users/search", to: "users#search"
-      resources :users, only: [ :show ]
+      
+      resources :users, only: [:show] do
+        collection do
+          get :profile
+          patch :profile, to: "users#update_profile"
+          get :search
+        end
+      end
 
       resources :groups do
         resources :members, controller: "group_members", only: [ :create, :destroy ]
